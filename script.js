@@ -1,8 +1,8 @@
 Init();
 
 // ====== Настройки ======
-var SCROLL_SPEED = 0.5;         // скорость анимации
-var SWIPE_THRESHOLD = 50;       // минимальная длина свайпа в px
+var SCROLL_SPEED    = 0.5;   // скорость анимации
+var SWIPE_THRESHOLD = 50;    // минимальная длина свайпа в px
 
 // ====== Состояние ======
 var ScrollState = false;
@@ -42,7 +42,7 @@ function UpdateScreen(operator) {
     var ActualSlideDOM = $('.pane[data-id=' + ActualSlide + ']');
     var CibleSlideDOM  = $('.pane[data-id=' + CibleSlide + ']');
 
-    // Горизонтальный/вертикальный сплит внутри одного .prt
+    // Внутри одного .prt — горизонтальный или вертикальный сплит
     if (
         ActualSlideDOM.closest('.prt').find('.spane').length &&
         ((operator === '+' && ActualSlideDOM.next('.pane').length) ||
@@ -68,72 +68,67 @@ function UpdateScreen(operator) {
     }
 }
 
-// ====== Прокрутка колесом мыши (десктоп) ======
+// ====== Колесо мыши (десктоп) ======
 $('.pane, .scrzone').on('mousewheel', function (event) {
     event.preventDefault();
-    if (ScrollState === false) {
-        ScrollState = true;
-        if (event.deltaY < 0) {
-            UpdateScreen('+');
-        } else if (event.deltaY > 0) {
-            UpdateScreen('-');
-        } else {
-            ScrollState = false;
-        }
-    }
-});
-
-// ====== Свайпы (тач-устройства) ======
-var touchStartX = 0, touchStartY = 0, touchActive = false;
-
-function onTouchStart(e) {
-    if (e.touches.length !== 1) { touchActive = false; return; } // игнорируем мультитач
-    touchActive = true;
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-}
-
-function onTouchMove(e) {
-    if (!touchActive) return;
-    // Блокируем нативный скролл/зум, чтобы не мешал анимации
-    if (e.cancelable) e.preventDefault();
-}
-
-function onTouchEnd(e) {
-    if (!touchActive) return;
-    touchActive = false;
-
-    var touch = e.changedTouches[0];
-    var dx = touch.clientX - touchStartX;
-    var dy = touch.clientY - touchStartY;
-    var absX = Math.abs(dx);
-    var absY = Math.abs(dy);
-
-    if (Math.max(absX, absY) < SWIPE_THRESHOLD) return; // слишком короткий свайп
     if (ScrollState === true) return;
 
     ScrollState = true;
-
-    // Определяем доминирующее направление
-    if (absY > absX) {
-        // Вертикальный свайп — как колесо мыши
-        if (dy < 0) UpdateScreen('+');   // свайп вверх → следующий слайд
-        else        UpdateScreen('-');   // свайп вниз  → предыдущий слайд
+    if (event.deltaY < 0) {
+        UpdateScreen('+');
+    } else if (event.deltaY > 0) {
+        UpdateScreen('-');
     } else {
-        // Горизонтальный свайп — только если внутри горизонтального/вертикального сплита
-        var inSplit = $(e.target).closest('.spane').length > 0;
-        if (!inSplit) { ScrollState = false; return; }
-        if (dx < 0) UpdateScreen('+');   // свайп влево → следующий
-        else        UpdateScreen('-');   // свайп вправо → предыдущий
+        ScrollState = false;
     }
+});
+
+// ====== Свайпы (только если есть тач) ======
+if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    var touchStartX = 0, touchStartY = 0, touchActive = false;
+
+    document.addEventListener('touchstart', function (e) {
+        if (e.touches.length !== 1) { touchActive = false; return; }
+        touchActive = true;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function (e) {
+        if (!touchActive || ScrollState === true) return;
+        if (e.cancelable) e.preventDefault();
+    }, { passive: false });
+
+    document.addEventListener('touchend', function (e) {
+        if (!touchActive) return;
+        touchActive = false;
+        if (ScrollState === true) return;
+
+        var touch = e.changedTouches[0];
+        var dx = touch.clientX - touchStartX;
+        var dy = touch.clientY - touchStartY;
+        var absX = Math.abs(dx);
+        var absY = Math.abs(dy);
+
+        if (Math.max(absX, absY) < SWIPE_THRESHOLD) return;
+
+        ScrollState = true;
+
+        if (absY > absX) {
+            // Вертикальный свайп
+            if (dy < 0) UpdateScreen('+');
+            else        UpdateScreen('-');
+        } else {
+            // Горизонтальный свайп — только внутри сплитов
+            var inSplit = $(e.target).closest('.spane').length > 0;
+            if (!inSplit) { ScrollState = false; return; }
+            if (dx < 0) UpdateScreen('+');
+            else        UpdateScreen('-');
+        }
+    }, { passive: true });
 }
 
-// Пассивное прослушивание для preventDefault требует passive: false
-document.addEventListener('touchstart', onTouchStart, { passive: true });
-document.addEventListener('touchmove',  onTouchMove,  { passive: false });
-document.addEventListener('touchend',   onTouchEnd,   { passive: true });
-
-// ====== Init() при ресайзе ======
+// ====== Init() при ресайзе и повороте ======
 $(window).on('resize orientationchange', function () {
     Init();
 });
