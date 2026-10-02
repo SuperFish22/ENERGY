@@ -1,14 +1,22 @@
 /* ===== Сброс и базовая типографика ===== */
 * { -o-box-sizing: border-box; box-sizing: border-box; }
 html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
-body {
+html, body {
     overflow: hidden;
-    color: rgba(255, 255, 255, 0.5);
-    font-family: 'Poppins', sans-serif;
+    touch-action: none;          /* отключает нативные жесты */
+    -webkit-tap-highlight-color: transparent;
 }
 
-#ScrollPane { position: relative; width: 100%; height: 100%; }
+#ScrollPane, .scr, .pane {
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
 
+/* Кнопки и ссылки должны оставаться кликабельными */
+a, button, .btn-new {
+    touch-action: manipulation;
+}
 .scr, .pane {
     position: relative;
     width: 100%;
