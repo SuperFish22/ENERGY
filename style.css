@@ -7,7 +7,6 @@ html, body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    touch-action: none;                  /* отключаем нативные жесты (свайпы) */
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -22,7 +21,7 @@ body {
     position: relative;
     width: 100%;
     height: 100%;
-    touch-action: none;
+    touch-action: pan-y;   /* не блокирует колесо мыши */
 }
 
 .scr, .pane {
@@ -30,7 +29,7 @@ body {
     width: 100%;
     height: 100%;
     font-size: 30px;
-    touch-action: none;
+    touch-action: pan-y;   /* разрешаем вертикальный жест, но не зум */
 }
 
 /* Ссылки и кнопки должны оставаться кликабельными */
