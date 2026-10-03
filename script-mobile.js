@@ -1,5 +1,5 @@
 /* ============================================================
-   MOBILE SCRIPT — управление свайпами (полная версия)
+   MOBILE SCRIPT — управление свайпами
    ============================================================ */
 
 $(document).ready(function() {
@@ -62,12 +62,10 @@ $(document).ready(function() {
             if (typeof $CibleSlide !== 'undefined' && $CibleSlide) {
                 var $pane = $('.pane[data-id="' + $CibleSlide + '"]');
                 if ($pane.length) {
-                    // Если слайд внутри .spane — прокручиваем .spane
                     var $spane = $pane.closest('.spane');
                     if ($spane.length) {
                         TweenMax.set($spane, {scrollTo: $pane});
                     }
-                    // И прокручиваем ScrollPane к родительскому .scr
                     var $scr = $pane.closest('.scr');
                     if (!$scr.length) $scr = $pane;
                     TweenMax.to('#ScrollPane', 0, {scrollTo: $scr});
@@ -144,27 +142,9 @@ function UpdateScreen(operator) {
         });
     } else {
         // === Случай 2: переход между разными .scr / .spane → скроллим #ScrollPane ===
-
-        // Находим родительский .scr целевого слайда
         var $targetScr = $CibleSlideDOM.closest('.scr');
         if (!$targetScr.length) $targetScr = $CibleSlideDOM;
 
-        // Сбрасываем горизонтальный .spane в начало/конец,
-        // чтобы при входе в блок сразу показывался нужный под-слайд
-        if ($cibleSpane.length) {
-            if (operator === '+') {
-                // входим сверху → показываем первый под-слайд
-                TweenMax.set($cibleSpane, {scrollTo: {x: 0}});
-            } else {
-                // входим снизу → показываем последний под-слайд
-                var $lastInSpane = $cibleSpane.find('.pane').last();
-                if ($lastInSpane.length) {
-                    TweenMax.set($cibleSpane, {scrollTo: $lastInSpane});
-                }
-            }
-        }
-
-        // Скроллим вертикально к нужному .scr
         TweenMax.to('#ScrollPane', $ScrollSpeed, {
             scrollTo: $targetScr,
             ease: Power2.easeOut,
