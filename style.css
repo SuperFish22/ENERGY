@@ -7,34 +7,34 @@ html, body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
 }
 
 body {
     color: rgba(255, 255, 255, 0.5);
     font-family: 'Poppins', sans-serif;
-    -webkit-user-select: none;
-    user-select: none;
 }
 
+/* Главное изменение: контейнер теперь скроллится сам */
 #ScrollPane {
     position: relative;
     width: 100%;
     height: 100%;
-    touch-action: pan-y;   /* не блокирует колесо мыши */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto; /* GSAP сам управляет анимацией, не мешаем */
 }
+
+/* Скрыть скроллбар у ScrollPane */
+#ScrollPane::-webkit-scrollbar { width: 0; height: 0; }
+#ScrollPane { scrollbar-width: none; -ms-overflow-style: none; }
 
 .scr, .pane {
     position: relative;
     width: 100%;
     height: 100%;
     font-size: 30px;
-    touch-action: pan-y;   /* разрешаем вертикальный жест, но не зум */
-}
-
-/* Ссылки и кнопки должны оставаться кликабельными */
-a, button, .btn-new {
-    touch-action: manipulation;
 }
 
 /* ===== Заголовки ===== */
@@ -53,17 +53,11 @@ b {
         5px 5px 10px rgba(0, 0, 0, 0.3);
 }
 
-span {
-    display: block;
-    text-align: center;
-}
+span { display: block; text-align: center; }
 
 /* ===== Горизонтальные слайды ===== */
-.horiz {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
+.horiz { position: relative; width: 100%; height: 100%; }
+
 .horiz .spane {
     overflow: hidden;
     font-size: 0;
@@ -71,34 +65,19 @@ span {
     width: 100%;
     height: 100%;
     white-space: nowrap;
+    touch-action: pan-x; /* разрешаем горизонтальные жесты внутри */
 }
-.horiz .pane {
-    display: inline-block;
-    width: 100%;
-}
+
+.horiz .pane { display: inline-block; width: 100%; }
 
 /* ===== Центрирующий контейнер (вертикальная колонка) ===== */
 .ct {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
     flex-direction: column;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    -webkit-justify-content: center;
     justify-content: center;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    -webkit-align-items: center;
     align-items: center;
     padding: 40px 20px;
     box-sizing: border-box;
@@ -111,6 +90,7 @@ span {
     opacity: 0;
     transition: all 0.5s cubic-bezier(0.175, 0.885, 0.380, 1.470);
 }
+
 .an.visible .ct {
     transform: translate3D(0, 0, 0) scale(1);
     opacity: 1;
@@ -134,9 +114,8 @@ span {
     width: 50%;
     top: 0;
 }
-.right {
-    left: 50%;
-}
+
+.right { left: 50%; }
 
 /* ===== Подсказки прокрутки ===== */
 .scrollup {
@@ -149,6 +128,7 @@ span {
     font-size: 20px;
     text-align: center;
 }
+
 .scrolldown {
     position: absolute;
     width: 200px;
@@ -164,8 +144,7 @@ span {
 #Helper {
     position: fixed;
     background: #ffffff;
-    bottom: 0;
-    left: 0;
+    bottom: 0; left: 0;
     padding: 5px;
     z-index: 3000;
     font-size: 12px;
@@ -200,9 +179,8 @@ span {
     padding: 0 20px;
     line-height: 1.6;
 }
-.welcome-content p {
-    font-size: 22px;
-}
+
+.welcome-content p { font-size: 22px; }
 
 /* ===== Абзацы ===== */
 p {
@@ -228,37 +206,83 @@ p {
     font-size: 20px;
     transition: .2s linear;
 }
+
 .btn-new:hover {
     transform: rotateZ(5deg);
     background: #0a55d0;
 }
 
-/* ===== Адаптив для телефонов ===== */
+/* ============================================================ */
+/* ===== АДАПТИВ ДЛЯ ПЛАНШЕТОВ И МОБИЛЬНЫХ ===== */
+/* ============================================================ */
+
+@media (max-width: 1024px) {
+    b { font-size: 56px; margin-bottom: 20px; }
+    p { font-size: 18px; }
+    .scr, .pane { font-size: 24px; }
+}
+
 @media (max-width: 768px) {
     b {
-        font-size: 42px;
-        margin-bottom: 20px;
+        font-size: 32px;
+        margin-bottom: 12px;
+        text-shadow:
+            1px 1px 0 #bbbbbb,
+            2px 2px 0 #cccccc,
+            3px 3px 5px rgba(0, 0, 0, 0.3);
     }
+
     p {
-        font-size: 16px;
+        font-size: 15px;
+        line-height: 1.45;
         padding: 0 12px;
+        margin: 6px auto;
     }
-    .ct {
-        padding: 20px 12px;
-    }
-    .scrolldown, .scrollup {
-        font-size: 16px;
-    }
-    #image-l1 {
-        max-width: 140px;
-    }
+
+    .scr, .pane { font-size: 16px; }
+
+    .ct { padding: 20px 12px; }
+
     #image-logo {
-        max-width: 80px;
-        top: 12px;
-        right: 12px;
+        max-width: 70px;
+        top: 10px;
+        right: 10px;
     }
+
+    #image-l1 {
+        max-width: 130px;
+        margin-top: 15px;
+    }
+
+    .scrolldown, .scrollup {
+        font-size: 13px;
+        width: 160px;
+        margin-left: -80px;
+    }
+
+    .welcome-content { padding: 0 12px; line-height: 1.4; }
+    .welcome-content p { font-size: 15px; }
+
     .btn-new {
         padding: 10px 22px;
         font-size: 16px;
     }
+
+    /* Вертикальные сплиты превращаем в стопку — так удобнее на телефоне */
+    .left, .right {
+        position: relative;
+        width: 100%;
+        height: 50%;
+        top: auto;
+        left: auto;
+    }
+    .right { left: auto; }
+}
+
+@media (max-width: 480px) {
+    b { font-size: 26px; }
+    p { font-size: 14px; }
+    #image-l1 { max-width: 110px; }
+    #image-logo { max-width: 55px; }
+    #Helper { display: none; } /* на телефоне отладка не нужна */
 }
