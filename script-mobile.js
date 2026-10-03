@@ -1,157 +1,73 @@
-/* ============================================================
-   MOBILE SCRIPT — управление свайпами
-   ============================================================ */
+console.log('mobile script loaded');
 
 $(document).ready(function() {
+    console.log('DOM ready');
 
-    // ===== Инициализация =====
-    Init();
-
-    // ===== Настройки свайпа =====
-    var touchStartY = 0;
-    var touchStartX = 0;
-    var touchStartTime = 0;
-    var touchThreshold = 40;   // минимальная дистанция свайпа в px
-    var touchMaxTime = 600;    // макс. длительность свайпа в мс
-
-    $(document)
-        .on('touchstart', function(e) {
-            if (e.originalEvent.touches.length !== 1) return;
-            var t = e.originalEvent.touches[0];
-            touchStartY = t.clientY;
-            touchStartX = t.clientX;
-            touchStartTime = Date.now();
-        })
-
-        .on('touchend', function(e) {
-            if ($ScrollState) return;
-
-            var t = e.originalEvent.changedTouches[0];
-            var deltaY = touchStartY - t.clientY;
-            var deltaX = touchStartX - t.clientX;
-            var duration = Date.now() - touchStartTime;
-
-            // Слишком долго — это был не свайп, а тап/удержание
-            if (duration > touchMaxTime) return;
-
-            var absY = Math.abs(deltaY);
-            var absX = Math.abs(deltaX);
-
-            // Вертикальный свайп
-            if (absY > absX && absY > touchThreshold) {
-                $ScrollState = true;
-                UpdateScreen(deltaY > 0 ? '+' : '-');
-            }
-            // Горизонтальный свайп
-            else if (absX > absY && absX > touchThreshold) {
-                $ScrollState = true;
-                UpdateScreen(deltaX > 0 ? '-' : '+');
-            }
-        });
-
-    // ===== Блокируем нативный скролл внутри ScrollPane =====
-    $('#ScrollPane').on('touchmove', function(e) {
-        e.preventDefault();
-    });
-
-    // ===== Resize / orientationchange =====
-    var resizeTimer;
-    $(window).on('resize orientationchange', function() {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function() {
-            if (typeof $CibleSlide !== 'undefined' && $CibleSlide) {
-                var $pane = $('.pane[data-id="' + $CibleSlide + '"]');
-                if ($pane.length) {
-                    var $spane = $pane.closest('.spane');
-                    if ($spane.length) {
-                        TweenMax.set($spane, {scrollTo: $pane});
-                    }
-                    var $scr = $pane.closest('.scr');
-                    if (!$scr.length) $scr = $pane;
-                    TweenMax.to('#ScrollPane', 0, {scrollTo: $scr});
-                }
-            }
-        }, 250);
-    });
-});
-
-
-/* ============================================================
-   ОБЩИЕ ФУНКЦИИ
-   ============================================================ */
-
-function Init() {
-    $ScrollSpeed = 0.4;   // на мобилке чуть быстрее — приятнее
+    // Инициализация
+    $ScrollSpeed = 0.4;
     $ScrollState = false;
 
-    // Собираем все слайды с data-id в порядке DOM
     $ListSlides = [];
     $('.pane[data-id]').each(function() {
         $ListSlides.push($(this).attr('data-id'));
     });
 
     $ActualSlide = $CibleSlide = $ListSlides[0];
+    console.log('slides:', $ListSlides);
 
-    // Сброс позиций
-    $('#ScrollPane').scrollTop(0);
-    $('.spane').scrollLeft(0);
+    var touchStartY = 0;
+    var touchStartX = 0;
+    var touchThreshold = 40;
 
-    // Показываем первый слайд
-    $('.visible').removeClass('visible');
-    $('.pane[data-id="' + $ActualSlide + '"]').addClass('visible');
+    document.addEventListener('touchstart', function(e) {
+        console.log('touchstart');
+        if (e.touches.length !== 1) return;
+        touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+    }, { passive: true });
 
-    $('#Helper').html('Mobile / Init()');
-}
+    document.addEventListener('touchend', function(e) {
+        console.log('touchend');
+        if ($ScrollState) return;
 
-function UpdateScreen(operator) {
-    $ActualSlide = $CibleSlide;
+        var t = e.changedTouches[0];
+        var deltaY = touchStartY - t.clientY;
+        var deltaX = touchStartX - t.clientX;
 
-    var idx = $ListSlides.indexOf($ActualSlide);
-    $CibleSlide = (operator === '+')
-        ? $ListSlides[idx + 1]
-        : $ListSlides[idx - 1];
+        console.log('deltaY:', deltaY, 'deltaX:', deltaX);
 
-    if (!$CibleSlide) {
+        if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > touchThreshold) {
+            $ScrollState = true;
+            console.log('swipe', deltaY > 0 ? '+' : '-');
+            nextSlide(deltaY > 0 ? '+' : '-');
+        }
+    }, { passive: true });
+});
+
+function nextSlide(operator) {
+    var idx = $ListSlides.indexOf($CibleSlide);
+    var next = (operator === '+') ? $ListSlides[idx + 1] : $ListSlides[idx - 1];
+
+    console.log('nextSlide:', $CibleSlide, '→', next);
+
+    if (!next) {
         $ScrollState = false;
-        $CibleSlide = $ActualSlide;
-        $('#Helper').html('Break');
         return;
     }
 
-    $('#Helper').html('Mobile: ' + $ActualSlide + ' → ' + $CibleSlide);
+    $ActualSlide = $CibleSlide;
+    $CibleSlide = next;
 
-    var $ActualSlideDOM = $('.pane[data-id="' + $ActualSlide + '"]');
-    var $CibleSlideDOM  = $('.pane[data-id="' + $CibleSlide + '"]');
+    var $target = $('.pane[data-id="' + next + '"]');
+    var $scr = $target.closest('.scr');
+    if (!$scr.length) $scr = $target;
 
-    // Определяем, в одном ли .spane находятся текущий и целевой слайды
-    var $actualSpane = $ActualSlideDOM.closest('.spane');
-    var $cibleSpane  = $CibleSlideDOM.closest('.spane');
-
-    var sameSpane = $actualSpane.length && $cibleSpane.length &&
-                    $actualSpane[0] === $cibleSpane[0];
-
-    if (sameSpane) {
-        // === Случай 1: оба слайда в одном .spane → скроллим .spane горизонтально ===
-        TweenMax.to($actualSpane, $ScrollSpeed, {
-            scrollTo: $CibleSlideDOM,
-            ease: Power2.easeOut,
-            onComplete: function() {
-                $ScrollState = false;
-                $CibleSlideDOM.addClass('visible');
-            }
-        });
-    } else {
-        // === Случай 2: переход между разными .scr / .spane → скроллим #ScrollPane ===
-        var $targetScr = $CibleSlideDOM.closest('.scr');
-        if (!$targetScr.length) $targetScr = $CibleSlideDOM;
-
-        TweenMax.to('#ScrollPane', $ScrollSpeed, {
-            scrollTo: $targetScr,
-            ease: Power2.easeOut,
-            onComplete: function() {
-                $ScrollState = false;
-                $CibleSlideDOM.addClass('visible');
-            }
-        });
-    }
+    TweenMax.to('#ScrollPane', 0.4, {
+        scrollTo: $scr,
+        ease: Power2.easeOut,
+        onComplete: function() {
+            $ScrollState = false;
+            $target.addClass('visible');
+        }
+    });
 }
