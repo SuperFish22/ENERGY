@@ -308,3 +308,11 @@ p {
     /* ===== Helper на телефоне не нужен ===== */
     #Helper { display: none; }
 }
+
+@media (max-width: 480px) {
+    b { font-size: 26px; }
+    p { font-size: 14px; }
+    #image-l1 { max-width: 110px; }
+    #image-logo { max-width: 55px; }
+    #Helper { display: none; } /* на телефоне отладка не нужна */
+}
