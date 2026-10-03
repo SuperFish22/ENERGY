@@ -3,11 +3,12 @@
 
   <head>
     <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ENERGY</title>
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu'>
-<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
-<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Poppins:300,400,600,700'><link rel="stylesheet" href="./style.css">
-<link rel="icon" href="img/logo.ico" type="image/x-icon">
+	<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
+	<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Poppins:300,400,600,700'><link rel="stylesheet" href="./style.css">
+	<link rel="icon" href="img/logo.ico" type="image/x-icon">
   </head>
     
   <body>
@@ -94,11 +95,33 @@
 </div>
 
 <div id="Helper"></div>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/plugins/ScrollToPlugin.min.js'></script><script  src="./script.js"></script>
+<script src="./lib/jquery.min.js"></script>
+<script src="./lib/TweenMax.min.js"></script>
+<script src="./lib/ScrollToPlugin.min.js"></script>
 
+<script>
+(function() {
+    // Определяем, тач-устройство или нет
+    var isTouchDevice = ('ontouchstart' in window) &&
+                        (navigator.maxTouchPoints > 0) &&
+                        !window.matchMedia('(pointer: fine)').matches;
+
+    // Создаём тег <script> для нужного файла
+    var s = document.createElement('script');
+    if (isTouchDevice) {
+        s.src = './script-mobile.js';
+        document.documentElement.classList.add('is-mobile');
+    } else {
+        s.src = './script-desktop.js';
+        document.documentElement.classList.add('is-desktop');
+    }
+    s.defer = true;
+    document.body.appendChild(s);
+
+    // Лог для отладки — потом можно убрать
+    console.log('Device:', isTouchDevice ? 'mobile' : 'desktop', '→ loading', s.src);
+})();
+</script>
   </body>
   
 </html>
