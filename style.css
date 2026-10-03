@@ -216,13 +216,9 @@ p {
 /* ===== АДАПТИВ ДЛЯ ПЛАНШЕТОВ И МОБИЛЬНЫХ ===== */
 /* ============================================================ */
 
-@media (max-width: 1024px) {
-    b { font-size: 56px; margin-bottom: 20px; }
-    p { font-size: 18px; }
-    .scr, .pane { font-size: 24px; }
-}
-
 @media (max-width: 768px) {
+
+    /* ===== Общие стили ===== */
     b {
         font-size: 32px;
         margin-bottom: 12px;
@@ -240,7 +236,6 @@ p {
     }
 
     .scr, .pane { font-size: 16px; }
-
     .ct { padding: 20px 12px; }
 
     #image-logo {
@@ -268,21 +263,48 @@ p {
         font-size: 16px;
     }
 
-    /* Вертикальные сплиты превращаем в стопку — так удобнее на телефоне */
-    .left, .right {
+    /* ===== Горизонтальные слайды (.horiz) — оставляем горизонтальными ===== */
+    .horiz .spane {
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: 0;
+    }
+    .horiz .spane > .pane {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        white-space: normal;
+        vertical-align: top;
+    }
+
+    /* ===== Вертикальные .tab-блоки (с .left и .right) ===== */
+    .scr.prt.tab .left {
+        display: none;  /* прячем декоративную левую панель */
+    }
+
+    .scr.prt.tab .right {
         position: relative;
         width: 100%;
-        height: 50%;
+        height: 100%;
         top: auto;
         left: auto;
     }
-    .right { left: auto; }
-}
 
-@media (max-width: 480px) {
-    b { font-size: 26px; }
-    p { font-size: 14px; }
-    #image-l1 { max-width: 110px; }
-    #image-logo { max-width: 55px; }
-    #Helper { display: none; } /* на телефоне отладка не нужна */
+    /* .right.spane — горизонтальная лента под-слайдов */
+    .scr.prt.tab .right.spane {
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: 0;
+    }
+
+    .scr.prt.tab .right.spane > .pane {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        white-space: normal;
+        vertical-align: top;
+    }
+
+    /* ===== Helper на телефоне не нужен ===== */
+    #Helper { display: none; }
 }
