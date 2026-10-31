@@ -1,0 +1,29 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Результаты — {{ t.title }} — ENERGY{% endblock %}
+{% block admin %}
+<p class="small"><a href="/admin/tests">← Тесты</a></p>
+<h1>{{ t.title }}: результаты</h1>
+<p class="muted small">Попыток: {{ attempts|length }}. Открытые ответы проверьте и поставьте зачёт вручную.</p>
+{% for a in attempts %}
+<details class="panel" id="a{{ a.id }}" style="margin-bottom:10px" {{ 'open' if a.needs_review }}>
+  <summary style="cursor:pointer;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+    <b>{{ a.user.display_name }}</b><span class="muted small">{{ a.created_at|dt }}</span>
+    <span>{{ '%g'|format(a.score) }} / {{ '%g'|format(a.max_score) }}</span>
+    {% if a.needs_review %}<span class="status status--new">на проверку</span>{% elif a.passed %}<span class="status status--enrolled">зачёт</span>{% else %}<span class="status status--rejected">незачёт</span>{% endif %}
+  </summary>
+  <div style="margin-top:12px">
+    {% for q in t.questions %}{% set ans = a.answers[loop.index0] if loop.index0 < a.answers|length else {} %}
+    <div class="small" style="padding:8px 0;border-top:1px solid var(--line)"><b>{{ loop.index }}. {{ q.text }}</b><br>
+      {% if q.type == 'text' %}<span style="white-space:pre-wrap">{{ ans.value or '—' }}</span>
+      {% else %}{% for i in ans.value or [] %}{{ q.options[i] if i < q.options|length else '?' }}{{ ', ' if not loop.last }}{% else %}—{% endfor %} {{ '✅' if ans.ok else '❌' }}{% endif %}
+    </div>{% endfor %}
+    <form method="post" action="/admin/attempts/{{ a.id }}" class="inline-form" style="margin-top:10px">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <select name="passed" aria-label="Итог"><option value="1" {{ 'selected' if a.passed }}>Зачёт</option><option value="0" {{ 'selected' if not a.passed }}>Незачёт</option></select>
+      <input name="reviewer_note" value="{{ a.reviewer_note or '' }}" placeholder="Комментарий для энерта" style="flex:1;min-width:200px">
+      <button class="btn btn--sm">Сохранить</button>
+    </form>
+  </div>
+</details>
+{% else %}<div class="panel empty">Ответов пока нет.</div>{% endfor %}
+{% endblock %}

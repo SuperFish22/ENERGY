@@ -1,0 +1,20 @@
+{% extends "admin/_layout.html" %}
+{% block title %}На одобрении — ENERGY{% endblock %}
+{% block admin %}
+<h1>На одобрении</h1>
+<p class="muted small">Всё, что команда отправила в общую базу. После одобрения игры и открытые материалы появятся на сайте, разработки — в общей базе конструкторов.</p>
+{% macro row(kind, obj, title, sub, link) %}
+<tr><td><a href="{{ link }}" target="_blank"><b>{{ title }}</b></a><div class="small muted">{{ sub }}</div></td>
+<td class="small">{{ obj.author.display_name if obj.author else '—' }}</td>
+<td><form method="post" class="inline-form"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="kind" value="{{ kind }}"><input type="hidden" name="id" value="{{ obj.id }}">
+<button class="btn btn--sm" name="action" value="approve">Одобрить</button><button class="btn btn--sm btn--danger" name="action" value="reject">Отклонить</button></form></td></tr>
+{% endmacro %}
+{% if games or materials or constructs %}
+<div class="table-wrap"><table>
+  <tr><th>Что</th><th>Автор</th><th></th></tr>
+  {% for g in games %}{{ row('game', g, g.title, 'Игра · ' ~ g.section, '/igroteka/' ~ g.slug) }}{% endfor %}
+  {% for m in materials %}{{ row('material', m, m.title, 'Материал · ' ~ m.category ~ ' · ' ~ {'public':'открытый','closed':'закрытый','link':'по ссылке'}[m.visibility], '/baza/' ~ m.slug) }}{% endfor %}
+  {% for c in constructs %}{{ row('construct', c, c.title, 'Конструктор · ' ~ CONSTRUCT_KINDS[c.kind], '/konstruktor/' ~ c.id) }}{% endfor %}
+</table></div>
+{% else %}<div class="panel empty">Очередь пуста ⚡️</div>{% endif %}
+{% endblock %}

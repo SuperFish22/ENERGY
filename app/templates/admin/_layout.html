@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block nav %}<a href="/">На сайт</a>{% endblock %}
+{% block content %}
+<div class="wrap admin">
+  <nav class="admin-nav">
+    {% set p = request.url.path %}
+    <a href="/admin" class="{{ 'is-active' if p == '/admin' }}">Обзор</a>
+    {% if 'leads.view' in perms %}<a href="/admin/leads" class="{{ 'is-active' if p.startswith('/admin/leads') }}">Заявки</a>{% endif %}
+    {% if ['journal.manage','tests.manage','tests.grade','eval.rate']|select('in', perms)|list %}<span class="nav-group">Учёба</span>{% endif %}
+    {% if 'journal.manage' in perms %}<a href="/admin/journal" class="{{ 'is-active' if p.startswith('/admin/journal') or p.startswith('/admin/people') }}">Журнал потока</a>{% endif %}
+    {% if 'tests.manage' in perms or 'tests.grade' in perms %}<a href="/admin/tests" class="{{ 'is-active' if p.startswith('/admin/tests') }}">Тесты</a>{% endif %}
+    {% if 'eval.rate' in perms %}<a href="/admin/eval" class="{{ 'is-active' if p.startswith('/admin/eval') }}">Оценочные листы</a>{% endif %}
+    {% if ['playroom.edit','kb.edit','kb.approve','news.edit']|select('in', perms)|list %}<span class="nav-group">Контент</span>{% endif %}
+    {% if 'kb.approve' in perms %}<a href="/admin/approvals" class="{{ 'is-active' if p.startswith('/admin/approvals') }}">На одобрении</a>{% endif %}
+    {% if 'playroom.edit' in perms %}<a href="/admin/games" class="{{ 'is-active' if p.startswith('/admin/games') }}">Игротека</a>{% endif %}
+    {% if 'kb.edit' in perms %}<a href="/admin/kb" class="{{ 'is-active' if p.startswith('/admin/kb') }}">База знаний</a>{% endif %}
+    {% if 'news.edit' in perms %}<a href="/admin/slides" class="{{ 'is-active' if p.startswith('/admin/slides') }}">Слайдер</a>{% endif %}
+    {% if 'constructors.use' in perms %}<a href="/konstruktor">Конструкторы ↗</a>{% endif %}
+    {% if ['users.manage','groups.manage']|select('in', perms)|list %}<span class="nav-group">Команда</span>{% endif %}
+    {% if 'users.manage' in perms %}<a href="/admin/users" class="{{ 'is-active' if p.startswith('/admin/users') }}">Люди и роли</a>{% endif %}
+    {% if 'groups.manage' in perms %}<a href="/admin/groups" class="{{ 'is-active' if p.startswith('/admin/groups') }}">Группы и права</a>{% endif %}
+  </nav>
+  <div style="min-width:0">
+    {% if request.query_params.get('saved') %}<p class="ok-box" style="margin-bottom:16px">Сохранено ✓</p>{% endif %}
+    {% block admin %}{% endblock %}
+  </div>
+</div>
+{% endblock %}

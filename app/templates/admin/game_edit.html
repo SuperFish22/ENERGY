@@ -1,0 +1,32 @@
+{% extends "admin/_layout.html" %}
+{% block title %}{{ g.title if g else 'Новая игра' }} — админка ENERGY{% endblock %}
+{% block admin %}
+<p class="small"><a href="/admin/games">← Игротека</a></p>
+<h1>{{ g.title if g else 'Новая игра' }}</h1>
+{% if g %}<p class="small muted">Статус: <b>{{ PUB_STATUSES[g.status] }}</b>{% if g.status == 'published' %} · <a href="/igroteka/{{ g.slug }}" target="_blank">открыть на сайте ↗</a>{% endif %}</p>{% endif %}
+<form method="post" action="/admin/games/{{ g.id if g else 0 }}" class="panel stack">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <div class="form-grid">
+    <label class="field field--wide"><span>Название *</span><input name="title" required value="{{ g.title if g else '' }}"></label>
+    <label class="field"><span>Раздел</span><select name="section">{% for s in GAME_SECTIONS %}<option {{ 'selected' if g and g.section == s }}>{{ s }}</option>{% endfor %}<option {{ 'selected' if g and g.section == 'Другое' }}>Другое</option></select></label>
+    <div class="field"><span>Возраст</span><div class="checks">{% for k, v in GAME_AGES.items() %}<label><input type="checkbox" name="ages" value="{{ k }}" {{ 'checked' if g and k in (g.ages or []) }}> {{ v }}</label>{% endfor %}</div></div>
+    <label class="field"><span>Участники</span><input name="players" value="{{ g.players if g else '' }}" placeholder="от 10 человек"></label>
+    <label class="field"><span>Длительность</span><input name="duration" value="{{ g.duration if g else '' }}" placeholder="10–15 минут"></label>
+    <label class="field"><span>Где</span><input name="place" value="{{ g.place if g else '' }}" placeholder="улица / помещение"></label>
+    <label class="field"><span>Реквизит</span><input name="props" value="{{ g.props if g else '' }}"></label>
+    <label class="field field--wide"><span>Описание и правила</span><textarea name="body" rows="14">{{ g.body if g else '' }}</textarea></label>
+  </div>
+  <p class="small muted">Разметка: пустая строка — новый абзац; «## » — подзаголовок; «- » — список; «> » в начале строк — речёвка или стих; **жирный**.</p>
+  <label class="check"><input type="checkbox" name="is_public" value="1" {{ 'checked' if not g or g.is_public }}> <span>Открытая игра (видна всем на сайте и в поиске). Без галочки — только для команды.</span></label>
+  <div class="inline-form">
+    {% if has_perm(user, 'kb.approve') %}
+      <button class="btn" name="action" value="publish">Опубликовать</button>
+      <button class="btn btn--ghost" name="action" value="draft">В черновик</button>
+      {% if g %}<button class="btn btn--danger" name="action" value="delete" formnovalidate onclick="return confirm('Удалить игру?')">Удалить</button>{% endif %}
+    {% else %}
+      <button class="btn btn--ghost" name="action" value="save">Сохранить черновик</button>
+      <button class="btn" name="action" value="submit">Отправить на одобрение</button>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}

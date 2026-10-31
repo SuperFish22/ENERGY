@@ -1,0 +1,36 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Админка — ENERGY{% endblock %}
+{% block admin %}
+<h1>Обзор</h1>
+<div class="kpis">
+  {% if 'leads.view' in perms %}
+  <a class="kpi" href="/admin/leads?status=new"><b>{{ counts.get('new', 0) }}</b><span>новых заявок</span></a>
+  <a class="kpi" href="/admin/leads?status=enrolled"><b>{{ counts.get('enrolled', 0) }}</b><span>зачислено</span></a>
+  {% endif %}
+  {% if 'kb.approve' in perms %}<a class="kpi" href="/admin/approvals"><b style="{{ 'color:var(--orange)' if pending }}">{{ pending }}</b><span>ждут одобрения</span></a>{% endif %}
+  {% if 'tests.grade' in perms %}<a class="kpi" href="/admin/tests"><b style="{{ 'color:var(--orange)' if to_review }}">{{ to_review }}</b><span>тестов на проверку</span></a>{% endif %}
+  <a class="kpi" href="/igroteka"><b>{{ games_total }}</b><span>игр в игротеке</span></a>
+  <a class="kpi" href="/baza"><b>{{ materials_total }}</b><span>материалов в базе</span></a>
+  <div class="kpi"><b>{{ users_total }}</b><span>людей на сайте</span></div>
+  <div class="kpi"><b>{{ groups_active }}</b><span>активных групп</span></div>
+</div>
+{% if latest %}
+<h2 class="h3">Последние заявки</h2>
+<div class="table-wrap"><table>
+  <tr><th>#</th><th>Имя</th><th>Телефон</th><th>Статус</th><th>Когда</th></tr>
+  {% for l in latest %}
+  <tr><td>{{ l.id }}</td><td>{{ l.full_name }}</td><td>{{ l.phone }}</td><td><span class="status status--{{ l.status }}">{{ {'new':'Новая','contacted':'Связались','enrolled':'Зачислен','rejected':'Отказ'}[l.status] }}</span></td><td>{{ l.created_at|dt }}</td></tr>
+  {% endfor %}
+</table></div>
+{% endif %}
+<div class="panel" style="margin-top:24px">
+  <h2 class="h3">Быстрый старт потока</h2>
+  <ol class="small" style="margin:0;padding-left:1.2em;color:var(--ink-2)">
+    <li>Энерты входят на сайт через Telegram (или через бота).</li>
+    <li>«Группы и права» → создайте группу потока и отметьте «Это поток», добавьте участников.</li>
+    <li>«Журнал потока» → добавьте 8 занятий и отмечайте посещаемость.</li>
+    <li>«Тесты» → проверьте импортированные тесты, откройте и отправьте ссылку в чат потока.</li>
+    <li>Карточка энерта → зачёты игротеки, баллы активности, выезд и аттестация.</li>
+  </ol>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Заявки — ENERGY{% endblock %}
+{% block admin %}
+<h1>Заявки на обучение</h1>
+<div class="toolbar">
+  <div class="tabs">
+    {% for key, title in statuses.items() %}<a href="?status={{ key }}" class="{{ 'is-active' if status == key }}">{{ title }}<em>{{ counts.get(key, 0) }}</em></a>{% endfor %}
+    <a href="?status=all" class="{{ 'is-active' if status not in statuses }}">Все</a>
+  </div>
+  <form class="inline-form" style="margin-left:auto"><input type="hidden" name="status" value="{{ status }}"><input name="q" value="{{ q }}" placeholder="Имя, телефон, @ник"><button class="btn btn--sm">Найти</button></form>
+</div>
+{% if leads %}
+<div class="table-wrap"><table>
+  <tr><th>#</th><th>Человек</th><th>Контакты</th><th>Детали</th><th>Статус и заметка</th></tr>
+  {% for l in leads %}
+  <tr id="lead-{{ l.id }}">
+    <td>{{ l.id }}<div class="small muted">{{ l.created_at|dt }}</div></td>
+    <td><b>{{ l.full_name }}</b>{% if l.age %}<div class="small muted">{{ l.age }} лет</div>{% endif %}</td>
+    <td><a href="tel:{{ l.phone }}">{{ l.phone }}</a>{% if l.telegram %}<div><a href="https://t.me/{{ l.telegram|replace('@','') }}" target="_blank" rel="noopener">{{ l.telegram }}</a></div>{% endif %}</td>
+    <td class="small">{% if l.city %}<div>🏙 {{ l.city }}</div>{% endif %}{% if l.source %}<div class="muted">🔎 {{ l.source }}</div>{% endif %}{% if l.comment %}<div>💬 {{ l.comment }}</div>{% endif %}</td>
+    <td>
+      <span class="status status--{{ l.status }}">{{ statuses[l.status] }}</span>
+      {% if 'leads.manage' in perms %}
+      <form method="post" action="/admin/leads/{{ l.id }}" class="inline-form" style="margin-top:8px">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="back" value="{{ request.url.path }}?status={{ status }}#lead-{{ l.id }}">
+        <select name="status">{% for key, title in statuses.items() %}<option value="{{ key }}" {{ 'selected' if l.status == key }}>{{ title }}</option>{% endfor %}</select>
+        <input name="admin_note" value="{{ l.admin_note or '' }}" placeholder="Заметка">
+        <button class="btn btn--sm">Сохранить</button>
+      </form>
+      {% elif l.admin_note %}<div class="small muted">{{ l.admin_note }}</div>{% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% else %}<div class="panel empty">Заявок нет.</div>{% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — {{ config.SITE_NAME }}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="page"><div class="wrap center">
+  <p class="kicker">Ошибка {{ code }}</p>
+  <h1>{{ title }}</h1>
+  <p class="muted">{{ message }}</p>
+  <a href="/" class="btn">На главную</a>
+</div></section>
+{% endblock %}

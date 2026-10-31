@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}База знаний вожатого | ENERGY{% endblock %}
+{% block description %}База знаний школы вожатых ENERGY: периодизация смены, возрастные особенности, мероприятия, огоньки и свечки.{% endblock %}
+{% block content %}
+<section class="page"><div class="wrap">
+  <div class="page-head">
+    <p class="kicker">База знаний</p>
+    <h1>Всё, что нужно вожатому</h1>
+    <p class="muted">{% if user and has_perm(user, 'kb.view_closed') %}Вы видите и открытые, и закрытые материалы команды ENERGY.{% else %}Открытые материалы школы вожатых ENERGY. Полная база — для энертов и педсостава после входа.{% endif %}</p>
+    <form class="search" method="get">
+      {% if cat %}<input type="hidden" name="cat" value="{{ cat }}">{% endif %}
+      <input name="q" id="kb-q" value="{{ q }}" placeholder="Поиск по базе" aria-label="Поиск по базе знаний">
+      <button class="btn btn--sm">Найти</button>
+    </form>
+  </div>
+  {% if cats %}
+  <nav class="filters"><a href="/baza" class="{{ 'is-active' if not cat }}">Все</a>{% for c in cats %}<a href="?cat={{ c|urlencode }}" class="{{ 'is-active' if cat == c }}">{{ c }}</a>{% endfor %}</nav>
+  {% endif %}
+  {% if items %}
+  <div class="kb-list">
+    {% for m in items %}
+    <a class="kb-item" href="/baza/{{ m.slug }}">
+      <span class="lock {{ 'lock--open' if m.visibility == 'public' }}">{{ 'Открытый' if m.visibility == 'public' else '🔒 Для команды' }} · {{ m.category }}</span>
+      <b>{{ m.title }}</b>
+      <p>{{ m.summary or m.body|excerpt(140) }}</p>
+      {% if ratings.get(m.id) %}<span class="stars-mini" style="margin:0">★ {{ ratings[m.id][0] }} · {{ ratings[m.id][1] }}</span>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}<div class="panel empty">Материалов пока нет{% if not user %} — <a href="/login?next=/baza">войдите</a>, чтобы увидеть закрытую базу{% endif %}.</div>{% endif %}
+  {% if user and has_perm(user, 'kb.edit') %}<p style="margin-top:24px"><a class="btn btn--ghost btn--sm" href="/admin/kb/new">+ Добавить материал</a></p>{% endif %}
+</div></section>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ schema.title }} — ENERGY{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="page"><div class="wrap" style="max-width:900px">
+  <p class="crumbs"><a href="/konstruktor">Конструкторы</a> → {{ CONSTRUCT_KINDS[kind] }}</p>
+  <h1>{{ schema.title }}</h1>
+  <p class="muted">{{ schema.lead }}</p>
+  <form method="post" action="{{ '/konstruktor/' ~ c.id if c else '/konstruktor/new/' ~ kind }}" class="cform" id="cform">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <div class="cfield"><label for="c-title">Название *</label><input type="text" id="c-title" name="title" required value="{{ c.title if c else '' }}" placeholder="Как назовём?"></div>
+    {% for f in schema.fields %}{% set val = data.get(f.key) %}
+    <div class="cfield" data-key="{{ f.key }}">
+      <span class="cfield__label">{{ f.label }}</span>
+      {% if f.hint %}<p class="hint">{{ f.hint }}</p>{% endif %}
+      {% if f.type == 'text' %}<input type="text" name="{{ f.key }}" id="f-{{ f.key }}" value="{{ val or '' }}" aria-label="{{ f.label }}">
+      {% elif f.type == 'textarea' %}<textarea name="{{ f.key }}" id="f-{{ f.key }}" rows="4" aria-label="{{ f.label }}">{{ val or '' }}</textarea>
+      {% elif f.type == 'select' %}<select name="{{ f.key }}" id="f-{{ f.key }}" aria-label="{{ f.label }}" {% if f.key == 'type' and kind == 'candle' %}data-bank-switch{% endif %}><option value="">— выбрать —</option>{% for o in f.options %}<option {{ 'selected' if val == o }}>{{ o }}</option>{% endfor %}</select>
+      {% elif f.type == 'multi' %}<div class="checks">{% for o in f.options %}<label><input type="checkbox" name="{{ f.key }}" value="{{ o }}" {{ 'checked' if o in (val or []) }}> {{ o }}</label>{% endfor %}</div>
+      {% elif f.type == 'list' %}
+        {% if f.bank %}<p class="hint">Нажмите на вопрос, чтобы добавить его:</p><div class="bank" id="bank"></div>{% endif %}
+        {% if f.key == 'rules' and kind == 'candle' and not val %}{% set val = candle_rules %}{% endif %}
+        <div class="list-rows" data-name="{{ f.key }}">{% for v in (val or ['']) %}<div class="list-row"><input type="text" name="{{ f.key }}" value="{{ v }}" aria-label="{{ f.label }}"><button type="button" class="row-del" aria-label="Удалить">×</button></div>{% endfor %}</div>
+        <button type="button" class="row-add" data-add-list="{{ f.key }}">+ Добавить пункт</button>
+      {% elif f.type == 'steps' %}
+        <div class="step-rows" data-name="{{ f.key }}" data-cols="{{ f.columns|length }}" style="--cols: {{ '1fr ' * f.columns|length }}">
+          <div class="step-row small muted" aria-hidden="true">{% for col in f.columns %}<b>{{ col }}</b>{% endfor %}<span></span></div>
+          {% for row in (val or [['']*f.columns|length]) %}<div class="step-row">{% for col in f.columns %}<textarea name="{{ f.key }}" rows="2" aria-label="{{ col }}" placeholder="{{ col }}">{{ row[loop.index0] if loop.index0 < row|length else '' }}</textarea>{% endfor %}<button type="button" class="row-del" aria-label="Удалить">×</button></div>{% endfor %}
+        </div>
+        <button type="button" class="row-add" data-add-step="{{ f.key }}">+ Добавить строку</button>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <div class="sticky-actions">
+      <button class="btn" name="action" value="save">Сохранить черновик</button>
+      <button class="btn btn--ghost" name="action" value="submit">Отправить в общую базу</button>
+      {% if c %}<a class="btn btn--ghost" href="/konstruktor/{{ c.id }}">Отмена</a>{% endif %}
+    </div>
+  </form>
+</div></section>
+<script>
+(function () {
+  var form = document.getElementById("cform");
+  function rowDel(e) { var b = e.target.closest(".row-del"); if (!b) return; var row = b.parentElement, box = row.parentElement;
+    if (box.querySelectorAll(".list-row, .step-row:not([aria-hidden])").length > 1) row.remove(); else row.querySelectorAll("input,textarea").forEach(function (i) { i.value = ""; }); }
+  form.addEventListener("click", function (e) {
+    rowDel(e);
+    var al = e.target.closest("[data-add-list]"); if (al) addList(al.dataset.addList, "");
+    var as = e.target.closest("[data-add-step]"); if (as) { var box = form.querySelector('.step-rows[data-name="' + as.dataset.addStep + '"]');
+      var tpl = box.querySelector(".step-row:not([aria-hidden])").cloneNode(true); tpl.querySelectorAll("textarea").forEach(function (t) { t.value = ""; }); box.appendChild(tpl); tpl.querySelector("textarea").focus(); }
+  });
+  function addList(name, value) {
+    var box = form.querySelector('.list-rows[data-name="' + name + '"]');
+    var empty = Array.prototype.find.call(box.querySelectorAll("input"), function (i) { return !i.value.trim(); });
+    if (empty && value) { empty.value = value; return; }
+    var row = box.querySelector(".list-row").cloneNode(true); row.querySelector("input").value = value; box.appendChild(row);
+    if (!value) row.querySelector("input").focus();
+  }
+  // банк вопросов для свечек
+  var bank = {{ bank|tojson }};
+  var bankBox = document.getElementById("bank"), sw = form.querySelector("[data-bank-switch]");
+  function drawBank() {
+    if (!bankBox) return; bankBox.innerHTML = "";
+    var list = (sw && bank[sw.value]) || [].concat.apply([], Object.keys(bank).map(function (k) { return bank[k]; })).slice(0, 12);
+    list.forEach(function (q) { var b = document.createElement("button"); b.type = "button"; b.textContent = q;
+      b.addEventListener("click", function () { addList("questions", q); b.disabled = true; b.style.opacity = .5; }); bankBox.appendChild(b); });
+  }
+  if (sw) sw.addEventListener("change", drawBank); drawBank();
+})();
+</script>
+{% endblock %}

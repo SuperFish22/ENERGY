@@ -1,0 +1,69 @@
+{% extends "admin/_layout.html" %}
+{% block title %}{{ p.display_name }} — ENERGY{% endblock %}
+{% block admin %}
+<div class="cab-head" style="margin-bottom:12px">
+  {% if p.photo_url %}<img class="avatar" src="{{ p.photo_url }}" alt="">{% else %}<div class="avatar">{{ p.display_name[:1] }}</div>{% endif %}
+  <div><h1 style="margin:0">{{ p.display_name }}</h1><span class="chip">{{ role_title(effective_role(p)) }}</span>{% for g in p.groups if g.is_active %}<span class="chip chip--blue">{{ g.name }}</span>{% endfor %}
+  {% if p.username %}<a class="small" href="https://t.me/{{ p.username }}" target="_blank" rel="noopener">@{{ p.username }}</a>{% endif %}</div>
+  <div class="ring" style="--p: {{ progress.total }};margin-left:auto;width:110px;height:110px"><b style="width:86px;height:86px;font-size:1.4rem">{{ progress.total }}%</b></div>
+</div>
+{% for w in progress.warnings %}<p class="warn">{{ w }}</p>{% endfor %}
+<div class="panel" style="margin-bottom:20px">
+  {% for b in progress.blocks %}<div class="pblock"><div class="pblock__head"><span>{{ b.title }}</span><span class="small">{{ b.detail }} · {{ '%g'|format(b.points) }}/{{ b.weight }}%</span></div><div class="bar bar--thin"><span style="width: {{ ([b.done, 1]|min * 100)|round }}%"></span></div></div>{% endfor %}
+</div>
+
+<div class="grid-2">
+  {% if 'journal.manage' in perms %}
+  <form method="post" class="panel">
+    <h2 class="h3">Зачёты по игротеке</h2>
+    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="credits">
+    <div class="perm-grid">{% for s in sections %}<label><input type="checkbox" name="sections" value="{{ s }}" {{ 'checked' if s in credits }}> {{ s }}</label>{% endfor %}</div>
+    <button class="btn btn--sm">Сохранить зачёты</button>
+  </form>
+  <form method="post" class="panel stack">
+    <h2 class="h3">Баллы и отметки</h2>
+    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="activity">
+    <div class="form-grid">
+      <label class="field"><span>Что</span><select name="kind">{% for k, v in ACTIVITY_KINDS.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select></label>
+      <label class="field"><span>Баллы</span><input name="points" type="number" step="0.5" value="1"></label>
+      <label class="field"><span>Дата</span><input type="date" name="on_date" value="{{ today }}"></label>
+      <label class="field"><span>Комментарий</span><input name="note" placeholder="вечерка, опоздание…"></label>
+    </div>
+    <p class="small muted" style="margin:0">Выезд и аттестация засчитываются самим фактом записи — баллы можно не менять.</p>
+    <button class="btn btn--sm">Добавить</button>
+  </form>
+  {% endif %}
+</div>
+
+{% if activities %}
+<h2 class="h3" style="margin-top:20px">История</h2>
+<div class="table-wrap"><table>
+  <tr><th>Дата</th><th>Что</th><th>Баллы</th><th>Комментарий</th><th>Кто</th><th></th></tr>
+  {% for a in activities %}<tr><td class="small">{{ a.on_date.strftime('%d.%m.%Y') if a.on_date else '' }}</td><td>{{ ACTIVITY_KINDS.get(a.kind, a.kind) }}</td><td>{{ '%g'|format(a.points) }}</td><td class="small">{{ a.note }}</td><td class="small">{{ a.by.display_name if a.by else '' }}</td>
+  <td>{% if 'journal.manage' in perms %}<form method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="delete_activity"><input type="hidden" name="activity_id" value="{{ a.id }}"><button class="row-del" aria-label="Удалить" onclick="return confirm('Удалить запись?')">×</button></form>{% endif %}</td></tr>{% endfor %}
+</table></div>
+{% endif %}
+
+{% if attempts %}
+<h2 class="h3" style="margin-top:20px">Тесты</h2>
+<div class="table-wrap"><table>{% for a in attempts %}<tr><td>{{ a.test.title }}</td><td class="small">{{ a.created_at|dt }}</td><td>{{ '%g'|format(a.score) }}/{{ '%g'|format(a.max_score) }}</td><td>{% if a.needs_review %}<span class="status status--new">на проверку</span>{% elif a.passed %}<span class="status status--enrolled">зачёт</span>{% else %}<span class="status status--rejected">незачёт</span>{% endif %}</td><td><a class="small" href="/admin/tests/{{ a.test_id }}/results#a{{ a.id }}">открыть</a></td></tr>{% endfor %}</table></div>
+{% endif %}
+
+{% if 'eval.rate' in perms %}
+<form method="post" class="panel" style="margin-top:20px">
+  <h2 class="h3">Оценочный лист (ENERGY PRO)</h2>
+  <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="eval">
+  <label class="field" style="max-width:220px"><span>Дата занятия</span><input type="date" name="on_date" value="{{ today }}"></label>
+  <div class="table-wrap" style="margin-top:10px"><table>
+    <tr><th>Критерий</th><th>Оценка 1–5</th><th>Комментарий</th></tr>
+    {% for c in criteria %}<tr><td>{{ c }}</td><td><select name="c{{ loop.index0 }}" aria-label="{{ c }}"><option value="">—</option>{% for n in range(1, 6) %}<option>{{ n }}</option>{% endfor %}</select></td><td><input name="m{{ loop.index0 }}" class="input" aria-label="Комментарий: {{ c }}"></td></tr>{% endfor %}
+  </table></div>
+  <button class="btn btn--sm" style="margin-top:12px">Сохранить оценки</button>
+  {% if evals %}
+  <details style="margin-top:14px"><summary style="cursor:pointer;font-weight:700">Все оценки ({{ evals|length }})</summary>
+    <div class="table-wrap" style="margin-top:8px"><table>{% for e in evals %}<tr><td class="small">{{ e.on_date.strftime('%d.%m.%Y') if e.on_date else '' }}</td><td>{{ e.criterion }}</td><td><b>{{ e.score }}</b></td><td class="small">{{ e.comment }}</td><td class="small">{{ e.rater.display_name if e.rater else '' }}</td></tr>{% endfor %}</table></div>
+  </details>
+  {% endif %}
+</form>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+{% block title %}Школа вожатых ENERGY — обучение вожатых в {{ config.SITE_CITY }}{% endblock %}
+{% block description %}Хочешь стать вожатым? Школа вожатых ENERGY с 2014 года: 2 месяца обучения, игротека, теория, вечерки и обязательный вожатский выезд. Обучили более 3000 человек.{% endblock %}
+{% block head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "EducationalOrganization",
+      "@id": "{{ config.SITE_URL }}/#org",
+      "name": "Школа вожатых ENERGY",
+      "alternateName": "Педагогический отряд ENERGY",
+      "foundingDate": "2014",
+      "url": "{{ config.SITE_URL }}/",
+      "logo": "{{ config.SITE_URL }}/static/img/logo.jpg",
+      "email": "{{ config.CONTACT_EMAIL }}",
+      "slogan": "ENERGY. Дерзай!",
+      "sameAs": ["{{ config.VK_URL }}"{% if config.TG_CHANNEL_URL %}, "{{ config.TG_CHANNEL_URL }}"{% endif %}]
+    },
+    {
+      "@type": "Course",
+      "name": "Курс вожатых ENERGY",
+      "description": "Двухмесячный поток: 8 занятий по субботам — игротека, теория, вечерки и свечки, аттестация и обязательный вожатский выезд.",
+      "provider": {"@id": "{{ config.SITE_URL }}/#org"},
+      "inLanguage": "ru",
+      "hasCourseInstance": {"@type": "CourseInstance", "courseMode": "onsite", "courseWorkload": "P2M"}
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type": "Question", "name": "Сколько длится обучение?", "acceptedAnswer": {"@type": "Answer", "text": "Поток идёт 2 месяца: 8 занятий по субботам, последнее — аттестация. После потока — вожатский выезд. Стоимость 3000 рублей."}},
+        {"@type": "Question", "name": "Нужен ли опыт?", "acceptedAnswer": {"@type": "Answer", "text": "Нет. Курс рассчитан на тех, кто только хочет стать вожатым."}},
+        {"@type": "Question", "name": "Что будет после обучения?", "acceptedAnswer": {"@type": "Answer", "text": "Сертификат ENERGY и помощь с трудоустройством минимум на одну смену в лагерь."}}
+      ]
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="blob blob--green" aria-hidden="true"></div>
+  <div class="blob blob--orange" aria-hidden="true"></div>
+  <div class="blob blob--blue" aria-hidden="true"></div>
+  <div class="wrap hero__in">
+    <div class="hero__text">
+      <p class="kicker">Педагогический отряд ENERGY · с 2014 года</p>
+      <h1>Школа вожатых <span class="hl">ENERGY</span></h1>
+      <ul class="hero__asks">
+        <li><i class="dot dot--green"></i>Хочешь стать вожатым?</li>
+        <li><i class="dot dot--orange"></i>Хочешь стать старшим вожатым или организатором мероприятий?</li>
+        <li><i class="dot dot--blue"></i>Хочешь прокачать свои вожатские навыки?</li>
+      </ul>
+      <p class="hero__lead">Присоединяйся к нам! Мы не просто обучаем — мы делимся образом жизни и идеями.</p>
+      <div class="hero__cta">
+        <a href="#zayavka" class="btn btn--lg">Записаться на поток</a>
+        <a href="#potok" class="btn btn--ghost btn--lg">Как проходит обучение</a>
+      </div>
+    </div>
+    <div class="hero__art">
+      <div class="orbit" aria-hidden="true"><span class="orbit__spark"></span></div>
+      <img src="/static/img/logo.png" alt="Логотип школы вожатых ENERGY" width="231" height="174" class="hero__logo">
+    </div>
+  </div>
+  <div class="wrap">
+    <dl class="stats">
+      <div class="stat"><dt>3000+</dt><dd>человек прошли обучение в ENERGY</dd></div>
+      <div class="stat"><dt>2 месяца</dt><dd>поток: 8 занятий и вожатский выезд</dd></div>
+      <div class="stat"><dt>с 2014</dt><dd>года работаем с лагерями Москвы, области и юга</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ============ СЛАЙДЕР ============ -->
+<section class="section section--slim" aria-label="Фотографии ENERGY">
+  <div class="wrap">
+    <div class="slider" id="slider" data-autoplay="6000">
+      <div class="slider__track">
+        {% for s in slides %}
+        <figure class="slide">
+          <img src="/media/slides/{{ s.image }}" alt="{{ s.title or 'ENERGY' }}" loading="{{ 'eager' if loop.first else 'lazy' }}">
+          {% if s.title or s.caption %}<figcaption><b>{{ s.title }}</b>{% if s.caption %}<span>{{ s.caption }}</span>{% endif %}</figcaption>{% endif %}
+        </figure>
+        {% endfor %}
+        <figure class="slide slide--brand slide--green">
+          <div><p class="kicker kicker--light">Каждую субботу</p><b>Игротека, теория, вечерка и свечка</b><span>16:30–20:30 — четыре часа настоящей лагерной жизни</span></div>
+        </figure>
+        <figure class="slide slide--brand slide--orange">
+          <div><p class="kicker kicker--light">После потока</p><b>Вожатский выезд</b><span>Три дня в лагере: отрабатываем навыки и погружаемся в атмосферу смены</span></div>
+        </figure>
+        <figure class="slide slide--brand slide--blue">
+          <div><p class="kicker kicker--light">Команды как отряды</p><b>Мастер и два куратора</b><span>У каждой команды свой наставник — как старший вожатый в лагере</span></div>
+        </figure>
+      </div>
+      <button class="slider__btn slider__btn--prev" type="button" aria-label="Предыдущий слайд">‹</button>
+      <button class="slider__btn slider__btn--next" type="button" aria-label="Следующий слайд">›</button>
+      <div class="slider__dots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ОБ ОТРЯДЕ ============ -->
+<section class="section" id="otryad">
+  <div class="wrap">
+    <div class="about">
+      <div>
+        <p class="kicker">О педагогическом отряде</p>
+        <h2>Педагогический отряд ENERGY</h2>
+        <p>Мы основаны в 2014 году. Больше десяти лет мы обучаем вожатых, старших вожатых, методистов, организаторов мероприятий и аниматоров. Обучили более трёх тысяч человек, которые работают в сфере детского (и не только) досуга — от детских лагерей до больших государственных институций.</p>
+        <p>Наша команда постоянно разрабатывает новые программы и форматы обучения. Также мы проводим обучение и тимбилдинг для компаний, придумываем и реализуем сценарии мероприятий и праздников.</p>
+      </div>
+      <blockquote class="quote">
+        <p>Мы не просто обучаем, мы делимся образом жизни и идеями.</p>
+        <footer>— команда ENERGY</footer>
+      </blockquote>
+    </div>
+
+    <div class="team-grid">
+      <div class="team-card"><b>Руководители</b><span>ведут школу и отвечают за каждый поток</span></div>
+      <div class="team-card"><b>Мастера</b><span>опытные наставники — «старшие вожатые» команд</span></div>
+      <div class="team-card"><b>Кураторы</b><span>«вожатые» команды, на связи 24/7</span></div>
+      <div class="team-card"><b>Методисты</b><span>наполняют занятия идеями и знаниями</span></div>
+      <div class="team-card"><b>Орг-группа</b><span>готовит легенду потока, вечерки</span></div>
+      <div class="team-card"><b>СМИ</b><span>ведут соцсети, фото и видео</span></div>
+    </div>
+
+    <div class="partners">
+      <div>
+        <h3>С нами работали лагеря</h3>
+        <ul class="chips">
+          <li>FollowMe Camp</li><li>РДМПОО «Водолей»</li><li>Best Friends</li><li>Лесной ЛОРД</li><li>Дубравушка</li>
+          <li>NeoCamp</li><li>MCamp</li><li>Новая стихия</li><li>Жемчужина России</li><li>7 звёзд</li><li>Глобус</li><li>Вымпел</li>
+        </ul>
+      </div>
+      <div>
+        <h3>И организации</h3>
+        <ul class="chips chips--alt">
+          <li>Московский педагогический колледж</li><li>КЦ «ЗИЛ»</li><li>Российская государственная библиотека для молодёжи</li>
+          <li>Музейно-парковый комплекс «Северное Тушино»</li><li>Сеть квестов «Клаустрофобия»</li><li>Детский центр «Водолей»</li>
+        </ul>
+      </div>
+    </div>
+    <p class="muted small">А ещё волонтёрим: школы помощников вожатых в московских школах и колледжах, программы НМИЦ ДГОИ им. Дмитрия Рогачёва, семейные центры, фестиваль NAUKA 0+.</p>
+  </div>
+</section>
+
+<!-- ============ ПОТОК ============ -->
+<section class="section section--tint" id="potok">
+  <div class="wrap">
+    <p class="kicker">Как проходит обучение</p>
+    <h2>Поток длится 2 месяца</h2>
+    <div class="potok">
+      <ul class="facts">
+        <li><b>8 занятий по субботам</b><span>7 базовых и последнее — аттестационное</span></li>
+        <li><b>Команды как отряды</b><span>после второго занятия делимся на команды: у каждой мастер и 2 куратора</span></li>
+        <li><b>Тест после каждого занятия</b><span>формат зачёт / незачёт, ссылка приходит в субботу вечером</span></li>
+        <li><b>Своя тетрадь игротеки</b><span>переписываешь игры от руки — это допуск к экзамену</span></li>
+        <li><b>Аттестация и сертификат</b><span>зачёт по играм и устный блок по теории</span></li>
+        <li><b>Вожатский выезд</b><span>после потока едем на 3 дня в лагерь — учимся и отрабатываем навыки</span></li>
+        <li><b>Работа в лагере</b><span>помогаем трудоустроиться минимум на одну смену</span></li>
+      </ul>
+      <div class="day">
+        <h3>Одна суббота в ENERGY</h3>
+        <ol class="timeline">
+          <li><time>16:30</time><span>Игротека: разбираем раздел игр</span></li>
+          <li><time>17:15</time><span>Лекция и разбор теории</span></li>
+          <li><time>18:20</time><span>Перерыв</span></li>
+          <li><time>18:40</time><span>Вечерка: визитки, дэнс-баттлы, музыкалки, театралки</span></li>
+          <li><time>19:50</time><span>Свечка</span></li>
+          <li><time>20:30</time><span>До следующей субботы!</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ПРОГРАММА ============ -->
+<section class="section" id="programma">
+  <div class="wrap">
+    <p class="kicker">Программа курса вожатых</p>
+    <h2>Чему ты научишься</h2>
+    <div class="cards">
+      <article class="card card--green"><h3>Возрастные особенности</h3><p>Чем живут дети 6–8, 9–12 и 13–17 лет и как с ними говорить, чтобы тебя слышали.</p></article>
+      <article class="card card--orange"><h3>Личность вожатого</h3><p>Кто такой вожатый, зачем он нужен детям и как не выгореть к середине смены.</p></article>
+      <article class="card card--blue"><h3>Мероприятия и КТД</h3><p>Как придумать, подготовить и провести дело, которое отряд запомнит.</p></article>
+      <article class="card card--green"><h3>Периодизация смены</h3><p>Организационный, основной и итоговый периоды: что делать в каждый день смены.</p></article>
+      <article class="card card--orange"><h3>Право и первая помощь</h3><p>Правовые основы работы с детьми и что делать, если что-то пошло не так.</p></article>
+      <article class="card card--blue"><h3>Конфликтология</h3><p>Ссоры в отряде, буллинг, конфликты с напарником — и как из них выходить.</p></article>
+      <article class="card card--green"><h3>Инклюзия</h3><p>Как создать среду, где комфортно каждому ребёнку, в том числе детям с ОВЗ.</p></article>
+      <article class="card card--orange"><h3>Игротека</h3><p>9 разделов: от игр на знакомство и сплочение до игр с залом и кричалок.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ПУТЬ ============ -->
+<section class="section section--tint" id="kak-stat-vozhatym">
+  <div class="wrap">
+    <p class="kicker">Путь энерта</p>
+    <h2>Как стать вожатым</h2>
+    <ol class="steps steps--5">
+      <li class="step"><span class="step__n">1</span><h3>Заявка</h3><p>Заполни форму — напишем и расскажем про ближайший поток.</p></li>
+      <li class="step"><span class="step__n">2</span><h3>Поток</h3><p>2 месяца занятий по субботам вместе с мастерами и кураторами.</p></li>
+      <li class="step"><span class="step__n">3</span><h3>Аттестация</h3><p>Зачёт по играм, теория и сертификат ENERGY.</p></li>
+      <li class="step"><span class="step__n">4</span><h3>Выезд</h3><p>Вожатский выезд: 3 дня в лагере.</p></li>
+      <li class="step"><span class="step__n">5</span><h3>Смена</h3><p>Работа в лагере — поможем трудоустроиться.</p></li>
+    </ol>
+    <div class="progress-teaser">
+      <div class="progress-teaser__head"><b>Шкала развития в личном кабинете</b><span>Вход через Telegram</span></div>
+      <div class="bar"><span style="width:68%"></span></div>
+      <div class="progress-teaser__legend"><span>Теория</span><span>Игротека</span><span>Посещаемость</span><span>Активность</span><span>Аттестация</span><span>Выезд</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ИГРОТЕКА ============ -->
+{% if fresh_games %}
+<section class="section" id="igroteka">
+  <div class="wrap">
+    <div class="section-head">
+      <div><p class="kicker">Открытая игротека</p><h2>{{ games_count }} игр для лагеря</h2></div>
+      <a href="/igroteka" class="btn btn--ghost">Вся игротека</a>
+    </div>
+    <div class="game-grid">
+      {% for g in fresh_games %}{% include "_game_card.html" %}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ============ ENERGY PRO ============ -->
+<section class="section section--dark" id="pro">
+  <div class="wrap pro">
+    <div>
+      <p class="kicker kicker--light">Для педагогического состава</p>
+      <h2>ENERGY PRO</h2>
+      <p>Круглогодичное повышение квалификации для тех, кто уже работает вожатым и в педсоставе школы: орг-группа, кураторство, СМИ. Мы не рассказываем то, что вы и так знаете, — мы разбираем то, что болит. На первой встрече группа сама собирает «карту запроса», и она становится программой курса.</p>
+      <p class="pro__note">Каждого участника оценивают по листам: активность, игротека, работа с трудными детьми, «я и напарник» и не только.</p>
+      <a href="{{ config.VK_URL }}" class="btn btn--light" target="_blank" rel="noopener">Написать нам о PRO</a>
+    </div>
+    <ul class="tags">
+      <li>Игротека</li><li>Конфликты в педсоставе</li><li>Особенные дети</li><li>Гаджеты</li>
+      <li>Мотивация</li><li>Рефлексия и свечки</li><li>Дисциплина и SOS-ситуации</li><li>Буллинг</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ ДЛЯ КОМПАНИЙ ============ -->
+<section class="section section--slim">
+  <div class="wrap band">
+    <div>
+      <h2 class="h3">Для компаний и праздников</h2>
+      <p>Проводим обучение и тимбилдинг для компаний, разрабатываем и реализуем самые разные сценарии мероприятий и праздников.</p>
+    </div>
+    <a href="{{ config.VK_URL }}" class="btn btn--ghost" target="_blank" rel="noopener">Обсудить мероприятие</a>
+  </div>
+</section>
+
+<!-- ============ ЗАЯВКА ============ -->
+<section class="section section--tint" id="zayavka">
+  <div class="wrap form-wrap">
+    <div class="form-side">
+      <p class="kicker">Запись на поток</p>
+      <h2>Стань частью ENERGY</h2>
+      <p>Оставь заявку на курс вожатых — мы свяжемся с тобой, расскажем про ближайший поток и ответим на все вопросы.</p>
+      <p class="form-side__alt">Удобнее в соцсетях? Пиши в <a href="{{ config.VK_URL }}" target="_blank" rel="noopener">сообщения группы ВКонтакте</a>{% if config.TG_CHANNEL_URL %} или читай наш <a href="{{ config.TG_CHANNEL_URL }}" target="_blank" rel="noopener">телеграм-канал</a>{% endif %}.</p>
+    </div>
+
+    <form class="lead-form" method="post" action="/api/lead" id="lead-form" novalidate>
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <div class="hp" aria-hidden="true"><label>Сайт <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+
+      <div class="form-ok" {% if request.query_params.get('sent') %}data-show{% endif %}>
+        <b>Заявка отправлена! ⚡️</b>
+        <p>Скоро напишем тебе. А пока загляни в <a href="/igroteka">открытую игротеку</a>.</p>
+      </div>
+
+      <div class="form-fields">
+        <label class="field field--wide"><span>Имя и фамилия *</span><input name="full_name" id="lf-name" required autocomplete="name" maxlength="160"></label>
+        <label class="field"><span>Возраст</span><input name="age" id="lf-age" type="number" min="12" max="99" inputmode="numeric"></label>
+        <label class="field"><span>Телефон *</span><input name="phone" id="lf-phone" type="tel" required autocomplete="tel" placeholder="+7" maxlength="32"></label>
+        <label class="field"><span>Telegram</span><input name="telegram" id="lf-tg" placeholder="@username" maxlength="64"></label>
+        <label class="field"><span>Город или вуз</span><input name="city" id="lf-city" maxlength="160"></label>
+        <label class="field field--wide"><span>Откуда узнал(а) о нас</span>
+          <select name="source" id="lf-source">
+            <option value="">— выбрать —</option>
+            <option>ВКонтакте</option><option>Telegram</option><option>Друзья посоветовали</option>
+            <option>Вуз / колледж</option><option>Поиск в интернете</option><option>Другое</option>
+          </select>
+        </label>
+        <label class="field field--wide"><span>Вопрос или комментарий</span><textarea name="comment" id="lf-comment" rows="3" maxlength="2000"></textarea></label>
+        <label class="check field--wide"><input type="checkbox" name="consent" id="lf-consent" value="1" required><span>Согласен(на) на обработку персональных данных по <a href="/privacy" target="_blank">политике конфиденциальности</a></span></label>
+        <p class="form-error field--wide" role="alert">{{ request.query_params.get('lead_error', '') }}</p>
+        <button class="btn btn--lg field--wide" type="submit">Отправить заявку</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="section" id="faq">
+  <div class="wrap faq">
+    <p class="kicker">Вопросы</p>
+    <h2>Часто спрашивают</h2>
+    <details><summary>Сколько длится обучение?</summary><p>Поток идёт 2 месяца: 8 занятий по субботам с 16:30 до 20:30. Последнее занятие — аттестационное. После потока — обязательный вожатский выезд на 3 дня.</p></details>
+    <details><summary>Нужен ли опыт, чтобы пойти учиться?</summary><p>Нет. Курс вожатых рассчитан на тех, кто только хочет стать вожатым. Всё, что нужно, — желание работать с детьми.</p></details>
+    <details><summary>Можно ли пропускать занятия?</summary><p>Допустимо не больше 3 пропусков за поток, и о каждом нужно предупредить мастера. Теорию можно наверстать, а практику — нет, поэтому лучше не пропускать.</p></details>
+    <details><summary>Что будет после обучения?</summary><p>Сертификат ENERGY и помощь с трудоустройством минимум на одну смену в лагерь. А дальше можно расти в педсоставе школы — в ENERGY PRO.</p></details>
+    <details><summary>Когда старт и сколько стоит?</summary><p>Даты ближайшего потока и условия расскажем после заявки, а также публикуем в группе ВКонтакте и телеграм-канале.</p></details>
+    <details><summary>Что такое личный кабинет?</summary><p>После зачисления ты входишь на сайт через Telegram и видишь свою шкалу развития: тесты, зачёты по игротеке, посещаемость, активность, выезд и аттестацию.</p></details>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}<script src="/static/js/main.js?v=2" defer></script>{% endblock %}

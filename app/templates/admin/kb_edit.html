@@ -1,0 +1,49 @@
+{% extends "admin/_layout.html" %}
+{% block title %}{{ m.title if m else 'Новый материал' }} — админка ENERGY{% endblock %}
+{% block admin %}
+<p class="small"><a href="/admin/kb">← База знаний</a></p>
+<h1>{{ m.title if m else 'Новый материал' }}</h1>
+{% if error %}<p class="err-box">{{ error }}</p>{% endif %}
+{% if m %}
+<div class="panel" style="margin-bottom:16px">
+  <p class="small muted" style="margin:0 0 8px">Статус: <b>{{ PUB_STATUSES[m.status] }}</b>{% if m.status == 'published' %} · <a href="/baza/{{ m.slug }}" target="_blank">открыть ↗</a>{% endif %}</p>
+  {% if m.visibility == 'link' %}
+  <div class="copy-row"><input readonly value="{{ config.SITE_URL }}/m/{{ m.link_token }}" id="mlink" aria-label="Закрытая ссылка"><button type="button" class="btn btn--sm" onclick="var i=document.getElementById('mlink');i.select();navigator.clipboard&&navigator.clipboard.writeText(i.value).catch(function(){})">Копировать</button>
+  <form method="post" action="/admin/kb/{{ m.id }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn btn--sm btn--ghost" name="action" value="new_link" onclick="return confirm('Старая ссылка перестанет работать. Продолжить?')">Новая ссылка</button></form></div>
+  {% endif %}
+</div>
+{% endif %}
+<form method="post" action="/admin/kb/{{ m.id if m else 0 }}" enctype="multipart/form-data" class="panel stack">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <div class="form-grid">
+    <label class="field field--wide"><span>Название *</span><input name="title" required value="{{ m.title if m else '' }}"></label>
+    <label class="field"><span>Раздел</span><input name="category" list="cats" value="{{ m.category if m else 'Теория' }}"><datalist id="cats">{% for c in cats %}<option>{{ c }}</option>{% endfor %}</datalist></label>
+    <label class="field"><span>Доступ</span><select name="visibility">{% for k, v in KB_VISIBILITY.items() %}<option value="{{ k }}" {{ 'selected' if (m and m.visibility == k) or (not m and k == 'closed') }}>{{ v }}</option>{% endfor %}</select></label>
+    <label class="field field--wide"><span>Коротко (видно в списке и в поиске)</span><input name="summary" maxlength="400" value="{{ m.summary if m else '' }}"></label>
+  </div>
+  <div class="field"><span>Инфографика — ключевые пункты (для открытых материалов)</span>
+    <div class="list-rows" id="kp">
+      {% for kp in (m.key_points if m and m.key_points else [{'title':'','text':''}]) %}
+      <div class="step-row" style="--cols: 1fr 2fr"><input name="kp_title" value="{{ kp.title }}" placeholder="Заголовок" aria-label="Заголовок пункта"><input name="kp_text" value="{{ kp.text }}" placeholder="Пояснение" aria-label="Пояснение"><button type="button" class="row-del" aria-label="Удалить" onclick="var r=this.parentElement;if(r.parentElement.children.length>1)r.remove();else r.querySelectorAll('input').forEach(function(i){i.value=''})">×</button></div>
+      {% endfor %}
+    </div>
+    <button type="button" class="row-add" onclick="var b=document.getElementById('kp'),r=b.lastElementChild.cloneNode(true);r.querySelectorAll('input').forEach(function(i){i.value=''});b.appendChild(r)">+ Пункт</button>
+  </div>
+  <label class="field"><span>Текст</span><textarea name="body" rows="16">{{ m.body if m else '' }}</textarea></label>
+  <p class="small muted">Разметка: «# » и «## » — заголовки, «- » — список, «1. » — нумерация, **жирный**, [ссылка](https://…).</p>
+  <div class="field"><span>Файл (PDF, Word, PowerPoint, Excel, до 50 МБ)</span>
+    {% if m and m.file_path %}<p class="small">Сейчас: <a href="/files/kb/{{ m.id }}">{{ m.file_name }}</a> <label class="small"><input type="checkbox" name="remove_file" value="1"> удалить</label></p>{% endif %}
+    <input type="file" name="file">
+  </div>
+  <div class="inline-form">
+    {% if has_perm(user, 'kb.approve') %}
+      <button class="btn" name="action" value="publish">Опубликовать</button>
+      <button class="btn btn--ghost" name="action" value="draft">В черновик</button>
+    {% else %}
+      <button class="btn btn--ghost" name="action" value="save">Сохранить черновик</button>
+      <button class="btn" name="action" value="submit">Отправить на одобрение</button>
+    {% endif %}
+    {% if m %}<button class="btn btn--danger" name="action" value="delete" formnovalidate onclick="return confirm('Удалить материал?')">Удалить</button>{% endif %}
+  </div>
+</form>
+{% endblock %}

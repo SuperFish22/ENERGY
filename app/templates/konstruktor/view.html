@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ c.title }} — {{ CONSTRUCT_KINDS[c.kind] }} | ENERGY{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="page"><div class="wrap" style="max-width:960px">
+  <p class="crumbs no-print"><a href="/konstruktor">Конструкторы</a> → {{ CONSTRUCT_KINDS[c.kind] }}</p>
+  <div class="doc">
+    <p class="kicker">{{ CONSTRUCT_KINDS[c.kind] }} · ENERGY</p>
+    <h1>{{ c.title }}</h1>
+    <div class="doc-meta"><span>Автор: {{ c.author.display_name if c.author else '—' }}</span><span>Обновлено: {{ c.updated_at|dt }}</span><span class="no-print">Статус: {{ PUB_STATUSES[c.status] }}</span></div>
+    {% for f in schema.fields %}{% set v = data.get(f.key) %}{% if v %}
+      <h2>{{ f.label }}</h2>
+      {% if f.type in ('text', 'select') %}<p>{{ v }}</p>
+      {% elif f.type == 'textarea' %}{{ v|md }}
+      {% elif f.type == 'multi' %}<p>{{ v|join(', ') }}</p>
+      {% elif f.type == 'list' %}<ul>{% for i in v %}<li>{{ i }}</li>{% endfor %}</ul>
+      {% elif f.type == 'steps' %}<div class="table-wrap"><table><tr>{% for col in f.columns %}<th>{{ col }}</th>{% endfor %}</tr>{% for row in v %}<tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>{% endfor %}</table></div>
+      {% endif %}
+    {% endif %}{% endfor %}
+  </div>
+  <div class="sticky-actions no-print">
+    <button class="btn btn--ghost" type="button" onclick="window.print()">Распечатать / PDF</button>
+    {% if c.author_id == user.id or has_perm(user, 'kb.approve') %}
+      <a class="btn btn--ghost" href="/konstruktor/{{ c.id }}/edit">Редактировать</a>
+      <form method="post" action="/konstruktor/{{ c.id }}" style="display:contents">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        {% if c.status in ('draft', 'rejected') and c.author_id == user.id %}<button class="btn" name="action" value="submit">Отправить в общую базу</button>{% endif %}
+        {% if has_perm(user, 'kb.approve') and c.status == 'pending' %}<button class="btn" name="action" value="approve">Одобрить</button><button class="btn btn--danger" name="action" value="reject">Отклонить</button>{% endif %}
+        {% if has_perm(user, 'kb.approve') and c.kind == 'game' and c.status == 'published' %}<button class="btn btn--ghost" name="action" value="to_playroom">Перенести в игротеку</button>{% endif %}
+        <button class="btn btn--danger" name="action" value="delete" formnovalidate onclick="return confirm('Удалить разработку?')">Удалить</button>
+      </form>
+    {% endif %}
+  </div>
+  {% if c.status == 'published' %}<div style="margin-top:20px" class="no-print">{% include "_rating.html" %}</div>{% endif %}
+</div></section>
+{% endblock %}

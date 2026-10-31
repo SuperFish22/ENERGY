@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}ENERGY в Telegram{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block head %}<script src="https://telegram.org/js/telegram-web-app.js"></script>{% endblock %}
+{% block content %}
+<section class="page"><div class="wrap center">
+  <img src="/static/img/logo.png" alt="" width="160">
+  <h1 class="h3" style="font-size:1.4rem">Открываем ENERGY…</h1>
+  <p class="muted" id="mini-status">Входим через Telegram</p>
+  <p><a class="btn" href="/cabinet" id="mini-fallback" hidden>Открыть кабинет</a></p>
+</div></section>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var to = params.get("to") || "/cabinet";
+  if (!to.startsWith("/") || to.startsWith("//")) to = "/cabinet";
+  var tg = window.Telegram && window.Telegram.WebApp;
+  function fail(msg) { document.getElementById("mini-status").textContent = msg; var a = document.getElementById("mini-fallback"); a.href = to; a.hidden = false; }
+  {% if user %}location.replace(to); return;{% endif %}
+  if (!tg || !tg.initData) { fail("Эта страница открывается из бота ENERGY в Telegram."); return; }
+  tg.ready(); tg.expand();
+  var fd = new FormData(); fd.append("init_data", tg.initData);
+  fetch("/auth/webapp", { method: "POST", body: fd, credentials: "same-origin" })
+    .then(function (r) { if (!r.ok) throw 0; location.replace(to); })
+    .catch(function () { fail("Не получилось войти. Попробуйте ещё раз или откройте сайт в браузере."); });
+})();
+</script>
+{% endblock %}

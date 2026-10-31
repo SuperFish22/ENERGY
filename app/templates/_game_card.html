@@ -1,0 +1,10 @@
+<a class="game-card" href="/igroteka/{{ g.slug }}">
+  <span class="game-card__sec">{{ g.section }}</span>
+  <b class="game-card__title">{{ g.title }}</b>
+  <span class="game-card__text">{{ g.body|excerpt(110) }}</span>
+  <span class="game-card__meta">
+    {% for a in g.ages or [] %}<i class="age age--{{ a }}">{{ a }}</i>{% endfor %}
+    {% if not g.is_public %}<i class="age age--closed">для команды</i>{% endif %}
+    {% if ratings is defined and ratings.get(g.id) %}<i class="stars-mini">★ {{ ratings[g.id][0] }}</i>{% endif %}
+  </span>
+</a>

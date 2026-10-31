@@ -1,0 +1,16 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Тесты — админка ENERGY{% endblock %}
+{% block admin %}
+<div class="section-head"><h1 style="margin:0">Тесты</h1>{% if 'tests.manage' in perms %}<a class="btn btn--sm" href="/admin/tests/new">+ Новый тест</a>{% endif %}</div>
+<p class="muted small">Тест раздаётся по закрытой ссылке. Энерт входит через Telegram, проходит тест, результат сразу попадает в его шкалу развития.</p>
+<div class="table-wrap"><table>
+  <tr><th>Тест</th><th>Ссылка</th><th>Прошли / зачёт</th><th>Приём ответов</th><th></th></tr>
+  {% for t in tests %}{% set st = stats[t.id] %}<tr>
+    <td>{% if 'tests.manage' in perms %}<a href="/admin/tests/{{ t.id }}"><b>{{ t.title }}</b></a>{% else %}<b>{{ t.title }}</b>{% endif %}<div class="small muted">{{ t.questions|length }} вопр. · зачёт от {{ t.pass_percent }}%{% if not t.counts_for_progress %} · не в шкале{% endif %}</div>{% if t.note %}<div class="small" style="color:#b2600e">⚠ {{ t.note[:90] }}…</div>{% endif %}</td>
+    <td><div class="copy-row"><input readonly value="{{ config.SITE_URL }}/t/{{ t.token }}" aria-label="Ссылка на тест"></div></td>
+    <td>{{ st[0] }} / {{ st[1] }}{% if st[2] %} <span class="status status--new">{{ st[2] }} на проверку</span>{% endif %}</td>
+    <td>{% if 'tests.manage' in perms %}<form method="post" action="/admin/tests/{{ t.id }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="back" value="/admin/tests"><button class="btn btn--sm {{ '' if t.is_open else 'btn--ghost' }}" name="action" value="toggle">{{ 'Открыт' if t.is_open else 'Закрыт' }}</button></form>{% else %}{{ 'Открыт' if t.is_open else 'Закрыт' }}{% endif %}</td>
+    <td>{% if 'tests.grade' in perms %}<a class="btn btn--sm btn--ghost" href="/admin/tests/{{ t.id }}/results">Результаты</a>{% endif %}</td>
+  </tr>{% else %}<tr><td colspan="5" class="empty">Тестов пока нет.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

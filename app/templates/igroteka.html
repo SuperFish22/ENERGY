@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{% if razdel %}{{ razdel }} — игры для лагеря{% else %}Открытая игротека — игры для лагеря{% endif %} | ENERGY{% endblock %}
+{% block description %}{% if razdel %}{{ razdel }}: игры для вожатых с правилами и речёвками.{% else %}Открытая игротека школы вожатых ENERGY: игры на знакомство, сплочение, подвижные игры, игры с залом и кричалки для лагеря.{% endif %}{% endblock %}
+{% block content %}
+<section class="page"><div class="wrap">
+  <div class="page-head">
+    <p class="kicker">Открытая игротека</p>
+    <h1>{{ razdel or 'Игры для лагеря' }}</h1>
+    <p class="muted">Игры из методичек школы вожатых ENERGY: правила, речёвки и подсказки для разного возраста. Пользуйтесь на здоровье — и приходите учиться проводить их вживую.</p>
+    <form class="search" method="get">
+      {% if razdel %}<input type="hidden" name="razdel" value="{{ razdel }}">{% endif %}
+      {% if vozrast %}<input type="hidden" name="vozrast" value="{{ vozrast }}">{% endif %}
+      <input name="q" id="ig-q" value="{{ q }}" placeholder="Найти игру: «знакомство», «мяч», «в автобусе»…" aria-label="Поиск по игротеке">
+      <button class="btn btn--sm">Найти</button>
+    </form>
+  </div>
+  <nav class="filters" aria-label="Разделы">
+    <a href="/igroteka{{ '?vozrast=' ~ vozrast if vozrast }}" class="{{ 'is-active' if not razdel }}">Все разделы</a>
+    {% for s in GAME_SECTIONS %}{% if counts.get(s) %}<a href="?razdel={{ s|urlencode }}{{ '&vozrast=' ~ vozrast if vozrast }}" class="{{ 'is-active' if razdel == s }}">{{ s }}<em>{{ counts[s] }}</em></a>{% endif %}{% endfor %}
+  </nav>
+  <nav class="filters" aria-label="Возраст">
+    <a href="?{{ 'razdel=' ~ razdel|urlencode if razdel }}" class="{{ 'is-active' if not vozrast }}">Любой возраст</a>
+    {% for k, v in GAME_AGES.items() %}<a href="?vozrast={{ k|urlencode }}{{ '&razdel=' ~ razdel|urlencode if razdel }}" class="{{ 'is-active' if vozrast == k }}">{{ v }}</a>{% endfor %}
+  </nav>
+  <p class="muted small">Найдено игр: {{ games|length }}</p>
+  {% if games %}
+  <div class="game-grid">{% for g in games %}{% include "_game_card.html" %}{% endfor %}</div>
+  {% else %}<div class="panel empty">Ничего не нашлось. Попробуйте другой раздел или слово.</div>{% endif %}
+  {% if user and has_perm(user, 'playroom.edit') %}<p style="margin-top:24px"><a class="btn btn--ghost btn--sm" href="/admin/games/new">+ Добавить игру</a> <a class="btn btn--ghost btn--sm" href="/konstruktor/new/game">Собрать в конструкторе</a></p>{% endif %}
+</div></section>
+{% endblock %}

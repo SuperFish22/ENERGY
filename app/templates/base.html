@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ config.SITE_NAME }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}Школа вожатых ENERGY: обучение вожатых, игротека, практика в лагере и курсы для педсостава. Дерзай!{% endblock %}">
+  {% block robots %}{% endblock %}
+  <link rel="canonical" href="{{ config.SITE_URL }}{{ request.url.path }}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ config.SITE_NAME }}">
+  <meta property="og:title" content="{{ self.title() }}">
+  <meta property="og:description" content="{{ self.description() }}">
+  <meta property="og:url" content="{{ config.SITE_URL }}{{ request.url.path }}">
+  <meta property="og:image" content="{{ config.SITE_URL }}/static/img/logo.jpg">
+  <meta property="og:locale" content="ru_RU">
+  <meta name="theme-color" content="#1f8a3b">
+  <link rel="icon" href="/static/img/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/static/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css?v=2">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <header class="topbar">
+    <div class="wrap topbar__in">
+      <a class="brand" href="/" aria-label="ENERGY — на главную">
+        <img src="/static/img/logo-mark.png" alt="" width="44" height="44">
+        <span class="brand__txt"><b>ENERGY</b><small>школа вожатых</small></span>
+      </a>
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Меню">
+      <label for="nav-toggle" class="burger" aria-hidden="true"><span></span></label>
+      <nav class="nav">
+        {% block nav %}
+        <a href="/#otryad">Об отряде</a>
+        <a href="/#potok">Обучение</a>
+        <a href="/igroteka">Игротека</a>
+        <a href="/baza">База знаний</a>
+        <a href="/#faq">Вопросы</a>
+        <a href="/vizitka" class="nav__vizitka" title="Посмотреть сайт как презентацию">▶ Визитка</a>
+        {% endblock %}
+        {% if user and has_perm(user, 'constructors.use') %}<a href="/konstruktor" class="nav__muted">Конструкторы</a>{% endif %}
+        {% if user %}
+          {% if is_staff(user) %}<a href="/admin" class="nav__muted">Админка</a>{% endif %}
+          <a href="/cabinet" class="btn btn--ghost btn--sm">Кабинет</a>
+        {% else %}
+          <a href="/login" class="nav__muted">Войти</a>
+          <a href="/#zayavka" class="btn btn--sm">Записаться</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">{% block content %}{% endblock %}</main>
+
+  <footer class="footer">
+    <div class="wrap footer__in">
+      <div>
+        <div class="footer__slogan">ENERGY. Дерзай!</div>
+        <p class="footer__muted">Педагогический отряд ENERGY — школа вожатых и старших вожатых.</p>
+      </div>
+      <div class="footer__links">
+        <a href="/igroteka">Открытая игротека</a>
+        <a href="/baza">База знаний</a>
+        <a href="{{ config.VK_URL }}" target="_blank" rel="noopener">Группа ВКонтакте</a>
+        {% if config.TG_CHANNEL_URL %}<a href="{{ config.TG_CHANNEL_URL }}" target="_blank" rel="noopener">Телеграм-канал</a>{% endif %}
+        <a href="/privacy">Политика конфиденциальности</a>
+      </div>
+      <div class="footer__muted footer__copy">© {{ year() }} ENERGY</div>
+    </div>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Конструкторы — ENERGY{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="page"><div class="wrap">
+  <p class="kicker">Для вожатых и педсостава</p>
+  <h1>Конструкторы</h1>
+  <p class="muted">Соберите игру, КТД, свечку или мероприятие по шагам, распечатайте и поделитесь с командой. В общую базу разработка попадает после одобрения руководителей.</p>
+  <div class="kinds">
+    <a class="kind kind--game" href="/konstruktor/new/game"><b>Игра</b><span>Правила, речёвка, варианты, безопасность</span><i>+ Создать</i></a>
+    <a class="kind kind--ktd" href="/konstruktor/new/ktd"><b>КТД</b><span>Шесть стадий коллективного творческого дела</span><i>+ Создать</i></a>
+    <a class="kind kind--candle" href="/konstruktor/new/candle"><b>Свечка / огонёк</b><span>Атмосфера, вопросы из банка, ритуал</span><i>+ Создать</i></a>
+    <a class="kind kind--event" href="/konstruktor/new/event"><b>Мероприятие</b><span>Тех. карта для старших вожатых</span><i>+ Создать</i></a>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <h2 class="h3">Мои разработки</h2>
+      {% if mine %}<div class="table-wrap"><table>
+        <tr><th>Название</th><th>Тип</th><th>Статус</th></tr>
+        {% for c in mine %}<tr><td><a href="/konstruktor/{{ c.id }}"><b>{{ c.title }}</b></a><div class="small muted">{{ c.updated_at|dt }}</div></td><td>{{ CONSTRUCT_KINDS[c.kind] }}</td><td><span class="status status--{{ {'draft':'rejected','pending':'new','published':'enrolled','rejected':'rejected'}[c.status] }}">{{ PUB_STATUSES[c.status] }}</span></td></tr>{% endfor %}
+      </table></div>{% else %}<div class="panel empty">Пока пусто — начните с любого конструктора выше.</div>{% endif %}
+    </div>
+    <div>
+      <h2 class="h3">Общая база разработок</h2>
+      <nav class="filters" style="margin-top:0"><a href="/konstruktor" class="{{ 'is-active' if not kind }}">Все</a>{% for k, v in CONSTRUCT_KINDS.items() %}<a href="?kind={{ k }}" class="{{ 'is-active' if kind == k }}">{{ v }}</a>{% endfor %}</nav>
+      {% if shared %}<div class="table-wrap"><table>
+        <tr><th>Название</th><th>Тип</th><th>Автор</th></tr>
+        {% for c in shared %}<tr><td><a href="/konstruktor/{{ c.id }}"><b>{{ c.title }}</b></a>{% if ratings.get(c.id) %} <span class="stars-mini">★ {{ ratings[c.id][0] }}</span>{% endif %}</td><td>{{ CONSTRUCT_KINDS[c.kind] }}</td><td class="small">{{ c.author.display_name if c.author else '—' }}</td></tr>{% endfor %}
+      </table></div>{% else %}<div class="panel empty">Одобренных разработок пока нет.</div>{% endif %}
+    </div>
+  </div>
+</div></section>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "admin/_layout.html" %}
+{% block title %}База знаний — админка ENERGY{% endblock %}
+{% block admin %}
+<div class="section-head"><h1 style="margin:0">База знаний</h1><a class="btn btn--sm" href="/admin/kb/new">+ Новый материал</a></div>
+<div class="toolbar">
+  <form class="inline-form">
+    <input name="q" value="{{ q }}" placeholder="Поиск">
+    <select name="cat"><option value="">Все разделы</option>{% for c in cats %}<option {{ 'selected' if cat == c }}>{{ c }}</option>{% endfor %}</select>
+    <select name="status"><option value="">Любой статус</option>{% for k, v in PUB_STATUSES.items() %}<option value="{{ k }}" {{ 'selected' if status == k }}>{{ v }}</option>{% endfor %}</select>
+    <button class="btn btn--sm">Показать</button>
+  </form>
+</div>
+{% if items %}
+<div class="table-wrap"><table>
+  <tr><th>Материал</th><th>Раздел</th><th>Доступ</th><th>Файл</th><th>Статус</th></tr>
+  {% for m in items %}<tr>
+    <td><a href="/admin/kb/{{ m.id }}"><b>{{ m.title }}</b></a><div class="small muted">{{ m.updated_at|dt }}</div></td>
+    <td class="small">{{ m.category }}</td>
+    <td class="small">{{ {'public':'Открытый','closed':'Закрытый','link':'По ссылке'}[m.visibility] }}</td>
+    <td class="small">{{ '📎' if m.file_path else '' }}</td>
+    <td><span class="status status--{{ {'draft':'rejected','pending':'new','published':'enrolled','rejected':'rejected'}[m.status] }}">{{ PUB_STATUSES[m.status] }}</span></td>
+  </tr>{% endfor %}
+</table></div>
+{% else %}<div class="panel empty">Материалов нет.</div>{% endif %}
+{% endblock %}

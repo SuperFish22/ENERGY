@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Личный кабинет — {{ config.SITE_NAME }}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="page"><div class="wrap">
+  <div class="cab-head">
+    {% if user.photo_url %}<img class="avatar" src="{{ user.photo_url }}" alt="">{% else %}<div class="avatar">{{ user.display_name[:1] }}</div>{% endif %}
+    <div>
+      <h1 style="margin:0 0 6px">Привет, {{ user.first_name or user.display_name }}!</h1>
+      <span class="chip">{{ role_title(effective_role(user)) }}</span>
+      {% for g in groups %}<span class="chip chip--blue">{{ g.name }}</span>{% endfor %}
+    </div>
+    <a href="/logout" class="btn btn--ghost btn--sm" style="margin-left:auto">Выйти</a>
+  </div>
+
+  <div class="cab-grid">
+    <div class="stack">
+      <div class="panel">
+        <div class="progress-top">
+          <div class="ring" style="--p: {{ progress.total }}"><b>{{ progress.total }}%</b></div>
+          <div>
+            <p class="kicker" style="margin:0">Шкала развития</p>
+            <h2 class="h3" style="font-size:1.5rem;margin:.2em 0">Уровень: {{ progress.level }}</h2>
+            {% if progress.next_level %}<p class="muted small" style="margin:0">До уровня «{{ progress.next_level[1] }}» — {{ progress.next_level[0] - progress.total }}%</p>{% endif %}
+            <div class="levels">{% for t, name in progress.levels %}<span class="chip {{ 'chip--orange' if name == progress.level else 'chip--grey' }}">{{ name }} · {{ t }}%</span>{% endfor %}</div>
+          </div>
+        </div>
+        {% for w in progress.warnings %}<p class="warn">{{ w }}</p>{% endfor %}
+        {% for b in progress.blocks %}
+        <div class="pblock">
+          <div class="pblock__head"><span>{{ b.title }}</span><span>{{ '%g'|format(b.points) }} / {{ b.weight }}%</span></div>
+          <p class="pblock__hint">{{ b.hint }}{% if b.detail %} · <b>{{ b.detail }}</b>{% endif %}</p>
+          <div class="bar bar--thin"><span style="width: {{ ([b.done, 1]|min * 100)|round }}%"></span></div>
+          {% if b.items %}<ul class="check-list">{% for name, ok in b.items %}<li class="{{ 'ok' if ok }}">{{ '✓ ' if ok }}{{ name }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if attempts %}
+      <div class="panel">
+        <h2 class="h3">Мои тесты</h2>
+        {% for a in attempts %}
+        <p class="small" style="margin:.4em 0"><a href="/t/{{ a.test.token }}/result/{{ a.id }}">{{ a.test.title }}</a> — {{ '%g'|format(a.score) }}/{{ '%g'|format(a.max_score) }}
+          {% if a.needs_review %}<span class="status status--new">на проверке</span>{% elif a.passed %}<span class="status status--enrolled">зачёт</span>{% else %}<span class="status status--rejected">незачёт</span>{% endif %}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="stack">
+      <div class="panel">
+        <h2 class="h3">Мои группы</h2>
+        {% if groups %}
+          {% for g in groups %}<p style="margin:.4em 0"><b>{{ g.name }}</b>{% if g.expires_at %} <span class="muted small">до {{ g.expires_at|dt(False) }}</span>{% endif %}</p>{% endfor %}
+        {% else %}<p class="muted small">Пока ни в одной. Руководитель добавит тебя в поток.</p>{% endif %}
+      </div>
+      {% if eval_avg %}
+      <div class="panel">
+        <h2 class="h3">Оценочный лист</h2>
+        <dl class="meta-list">{% for c, v in eval_avg.items() %}<div><dt>{{ c }}</dt><dd>{{ v }} / 5</dd></div>{% endfor %}</dl>
+      </div>
+      {% endif %}
+      <div class="panel">
+        <h2 class="h3">Полезное</h2>
+        <p style="margin:.3em 0"><a href="/igroteka">🎲 Открытая игротека</a></p>
+        <p style="margin:.3em 0"><a href="/baza">📚 База знаний</a></p>
+        {% if 'constructors.use' in perms %}<p style="margin:.3em 0"><a href="/konstruktor">🛠 Конструкторы</a></p>{% endif %}
+        {% if is_staff(user) %}<a href="/admin" class="btn btn--sm" style="margin-top:12px">Открыть админку</a>{% endif %}
+      </div>
+      {% if my_constructs %}
+      <div class="panel">
+        <h2 class="h3">Мои разработки</h2>
+        {% for c in my_constructs %}<p class="small" style="margin:.35em 0"><a href="/konstruktor/{{ c.id }}">{{ c.title }}</a> <span class="muted">· {{ CONSTRUCT_KINDS[c.kind] }} · {{ PUB_STATUSES[c.status] }}</span></p>{% endfor %}
+      </div>
+      {% endif %}
+      {% if my_perms %}
+      <details class="panel"><summary style="cursor:pointer;font-weight:800">Мои права ({{ my_perms|length }})</summary>
+        <ul class="small muted" style="padding-left:1.1em;margin:10px 0 0">{% for p in my_perms %}<li>{{ PERMISSIONS[p] }}</li>{% endfor %}</ul>
+      </details>
+      {% endif %}
+    </div>
+  </div>
+</div></section>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "admin/_layout.html" %}
+{% block title %}{{ t.title if t else 'Новый тест' }} — ENERGY{% endblock %}
+{% block admin %}
+<p class="small"><a href="/admin/tests">← Тесты</a></p>
+<h1>{{ t.title if t else 'Новый тест' }}</h1>
+{% if t %}
+<div class="panel" style="margin-bottom:16px">
+  <b>Закрытая ссылка для энертов</b>
+  <div class="copy-row" style="margin-top:8px"><input readonly id="tlink" value="{{ config.SITE_URL }}/t/{{ t.token }}" aria-label="Ссылка"><button type="button" class="btn btn--sm" onclick="var i=document.getElementById('tlink');i.select();navigator.clipboard&&navigator.clipboard.writeText(i.value).catch(function(){})">Копировать</button>
+  <form method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn btn--sm btn--ghost" name="action" value="new_link" onclick="return confirm('Старая ссылка перестанет работать. Продолжить?')">Новая ссылка</button></form>
+  <a class="btn btn--sm btn--ghost" href="/admin/tests/{{ t.id }}/results">Результаты</a></div>
+</div>
+{% if t.note %}<p class="notice" style="margin-bottom:16px">⚠ {{ t.note }}</p>{% endif %}
+{% endif %}
+<form method="post" action="/admin/tests/{{ t.id if t else 0 }}" id="tform" class="stack">
+  <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="questions_json" id="qjson">
+  <div class="panel form-grid">
+    <label class="field field--wide"><span>Название *</span><input name="title" required value="{{ t.title if t else '' }}"></label>
+    <label class="field field--wide"><span>Описание для энертов</span><input name="description" value="{{ t.description if t else 'Тест по теме занятия. Формат — зачёт / незачёт.' }}"></label>
+    <label class="field"><span>Зачёт от, %</span><input type="number" name="pass_percent" min="1" max="100" value="{{ t.pass_percent if t else 60 }}"></label>
+    <div class="field"><span>Настройки</span>
+      <label class="check"><input type="checkbox" name="is_open" value="1" {{ 'checked' if t and t.is_open }}> <span>Принимать ответы</span></label>
+      <label class="check"><input type="checkbox" name="counts_for_progress" value="1" {{ 'checked' if not t or t.counts_for_progress }}> <span>Идёт в шкалу «Теория»</span></label>
+      <label class="check"><input type="checkbox" name="show_answers" value="1" {{ 'checked' if t and t.show_answers }}> <span>Показывать разбор после сдачи</span></label>
+    </div>
+    <label class="field field--wide"><span>Служебная заметка (видно только в админке)</span><input name="note" value="{{ t.note if t else '' }}"></label>
+  </div>
+  <div class="q-editor" id="qed"></div>
+  <div class="inline-form">
+    <button type="button" class="row-add" data-add="single">+ Один ответ</button>
+    <button type="button" class="row-add" data-add="multi">+ Несколько ответов</button>
+    <button type="button" class="row-add" data-add="text">+ Открытый вопрос</button>
+  </div>
+  <p class="small muted">Отметьте правильные варианты галочкой. Открытые вопросы не дают баллов — их проверяет мастер на странице результатов.</p>
+  <div class="sticky-actions">
+    <button class="btn" name="action" value="save">Сохранить</button>
+    {% if t %}<button class="btn btn--danger" name="action" value="delete" formnovalidate onclick="return confirm('Удалить тест вместе с результатами?')">Удалить</button>{% endif %}
+  </div>
+</form>
+<script>
+(function () {
+  var qs = {{ (t.questions if t else [])|tojson }};
+  var box = document.getElementById("qed");
+  var TYPES = { single: "Один ответ", multi: "Несколько ответов", text: "Открытый вопрос" };
+  function el(tag, attrs, html) { var e = document.createElement(tag); for (var k in attrs || {}) e.setAttribute(k, attrs[k]); if (html != null) e.innerHTML = html; return e; }
+  function draw() {
+    box.innerHTML = "";
+    qs.forEach(function (q, qi) {
+      var card = el("div", { class: "q" });
+      var head = el("div", { class: "q-head" });
+      var num = el("b", {}, (qi + 1) + "."); head.appendChild(num);
+      var ta = el("textarea", { rows: 2, "aria-label": "Текст вопроса" }); ta.value = q.text || ""; ta.oninput = function () { q.text = ta.value; }; head.appendChild(ta);
+      var sel = el("select", { "aria-label": "Тип вопроса" }); Object.keys(TYPES).forEach(function (k) { var o = el("option", { value: k }, TYPES[k]); if (q.type === k) o.selected = true; sel.appendChild(o); });
+      sel.onchange = function () { q.type = sel.value; if (q.type === "single") q.correct = (q.correct || []).slice(0, 1); draw(); }; head.appendChild(sel);
+      if (q.type !== "text") { var pts = el("input", { type: "number", min: "0.5", step: "0.5", style: "width:70px", "aria-label": "Баллы", title: "Баллы" }); pts.value = q.points || 1; pts.oninput = function () { q.points = parseFloat(pts.value) || 1; }; head.appendChild(pts); }
+      [["↑", -1], ["↓", 1]].forEach(function (m) { var b = el("button", { type: "button", class: "btn btn--sm btn--ghost", "aria-label": "Переместить" }, m[0]); b.onclick = function () { var j = qi + m[1]; if (j < 0 || j >= qs.length) return; var t = qs[qi]; qs[qi] = qs[j]; qs[j] = t; draw(); }; head.appendChild(b); });
+      var del = el("button", { type: "button", class: "row-del", "aria-label": "Удалить вопрос" }, "×"); del.onclick = function () { if (confirm("Удалить вопрос?")) { qs.splice(qi, 1); draw(); } }; head.appendChild(del);
+      card.appendChild(head);
+      if (q.type !== "text") {
+        q.options = q.options || []; q.correct = q.correct || [];
+        q.options.forEach(function (o, oi) {
+          var row = el("div", { class: "q-opt" });
+          var c = el("input", { type: q.type === "multi" ? "checkbox" : "radio", name: "c" + qi, title: "Правильный ответ", "aria-label": "Правильный ответ" });
+          c.checked = q.correct.indexOf(oi) > -1;
+          c.onchange = function () { if (q.type === "single") q.correct = [oi]; else { q.correct = q.correct.filter(function (x) { return x !== oi; }); if (c.checked) q.correct.push(oi); } };
+          var t = el("input", { type: "text", "aria-label": "Вариант ответа" }); t.value = o; t.oninput = function () { q.options[oi] = t.value; };
+          var d = el("button", { type: "button", class: "row-del", "aria-label": "Удалить вариант" }, "×");
+          d.onclick = function () { q.options.splice(oi, 1); q.correct = q.correct.filter(function (x) { return x !== oi; }).map(function (x) { return x > oi ? x - 1 : x; }); draw(); };
+          row.appendChild(c); row.appendChild(t); row.appendChild(d); card.appendChild(row);
+        });
+        var add = el("button", { type: "button", class: "row-add" }, "+ Вариант"); add.onclick = function () { q.options.push(""); draw(); }; card.appendChild(add);
+      }
+      box.appendChild(card);
+    });
+  }
+  document.querySelectorAll("[data-add]").forEach(function (b) { b.onclick = function () { var t = b.dataset.add; qs.push({ type: t, text: "", options: t === "text" ? [] : ["", ""], correct: [], points: t === "text" ? 0 : 1 }); draw(); box.lastElementChild.querySelector("textarea").focus(); }; });
+  document.getElementById("tform").addEventListener("submit", function () { document.getElementById("qjson").value = JSON.stringify(qs); });
+  draw();
+})();
+</script>
+{% endblock %}

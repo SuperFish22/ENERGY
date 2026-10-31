@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ m.title }} | База знаний ENERGY{% endblock %}
+{% block description %}{{ m.summary or m.body|excerpt(150) }}{% endblock %}
+{% block robots %}{% if m.visibility != 'public' or m.status != 'published' %}<meta name="robots" content="noindex, nofollow">{% endif %}{% endblock %}
+{% block content %}
+<section class="page"><div class="wrap">
+  <p class="crumbs"><a href="/baza">База знаний</a> → {{ m.category }}</p>
+  <h1>{{ m.title }}</h1>
+  {% if m.summary %}<p class="hero__lead">{{ m.summary }}</p>{% endif %}
+  {% if m.status != 'published' %}<p class="notice">Статус: {{ PUB_STATUSES[m.status] }}. Материал пока виден только автору и руководителям.</p>{% endif %}
+  {% if m.key_points %}
+  <div class="infographic">{% for kp in m.key_points %}<div class="ig"><b>{{ kp.title }}</b><span>{{ kp.text }}</span></div>{% endfor %}</div>
+  {% endif %}
+  <div class="article">
+    <article class="article__body">
+      {{ m.body|md }}
+      {% if m.file_path %}
+      <div class="file-box"><span style="font-size:1.6rem">📎</span><div><b>{{ m.file_name }}</b><br><a href="/files/kb/{{ m.id }}">Скачать файл</a></div></div>
+      {% endif %}
+    </article>
+    <aside class="aside">
+      <div class="panel">
+        <dl class="meta-list">
+          <div><dt>Раздел</dt><dd>{{ m.category }}</dd></div>
+          <div><dt>Доступ</dt><dd>{{ {'public':'Открытый','closed':'Для команды','link':'По ссылке'}[m.visibility] }}</dd></div>
+          <div><dt>Обновлено</dt><dd>{{ m.updated_at|dt(False) }}</dd></div>
+        </dl>
+        {% if user and has_perm(user, 'kb.edit') %}<a href="/admin/kb/{{ m.id }}" class="btn btn--ghost btn--sm" style="margin-top:14px">Редактировать</a>{% endif %}
+      </div>
+      {% include "_rating.html" %}
+    </aside>
+  </div>
+</div></section>
+{% endblock %}

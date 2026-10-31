@@ -1,0 +1,19 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Посещаемость {{ lesson.date.strftime('%d.%m') }} — ENERGY{% endblock %}
+{% block admin %}
+<p class="small"><a href="/admin/journal?group={{ g.id }}">← {{ g.name }}</a></p>
+<h1>{{ lesson.date.strftime('%d.%m.%Y') }} · {{ lesson.title or 'Занятие' }}</h1>
+<form method="post" action="/admin/journal/{{ g.id }}" class="panel">
+  <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="save_attendance"><input type="hidden" name="lesson_id" value="{{ lesson.id }}">
+  <p class="inline-form"><button type="button" class="btn btn--sm btn--ghost" onclick="document.querySelectorAll('[name=present]').forEach(function(c){c.checked=true})">Отметить всех</button></p>
+  <div class="table-wrap"><table>
+    <tr><th>Человек</th><th>Был</th><th>Не был, но предупредил</th></tr>
+    {% for u in members %}{% set m = marks.get(u.id) %}
+    <tr><td>{{ u.display_name }} <span class="small muted">{{ role_title(effective_role(u)) }}</span></td>
+      <td><input type="checkbox" name="present" value="{{ u.id }}" {{ 'checked' if m and m.present }} aria-label="Был"></td>
+      <td><input type="checkbox" name="excused" value="{{ u.id }}" {{ 'checked' if m and m.excused }} aria-label="Предупредил"></td></tr>
+    {% endfor %}
+  </table></div>
+  <button class="btn" style="margin-top:14px">Сохранить посещаемость</button>
+</form>
+{% endblock %}

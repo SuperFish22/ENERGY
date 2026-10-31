@@ -1,0 +1,41 @@
+{% extends "admin/_layout.html" %}
+{% block title %}{{ g.name }} — группы — ENERGY{% endblock %}
+{% block admin %}
+<p class="small"><a href="/admin/groups">← Все группы</a></p>
+<h1>{{ g.name }} {% if not g.is_active %}<span class="status status--rejected">Закрыта</span>{% endif %}</h1>
+<div class="stack">
+  {% if error %}<div class="err-box">{{ error }}</div>{% endif %}
+  <div class="panel">
+    <h2 class="h3">Участники ({{ g.members|length }})</h2>
+    <form method="post" class="inline-form" style="margin-bottom:14px">
+      <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="add_member">
+      <input name="member" placeholder="@username или Telegram id" required>
+      <button class="btn btn--sm">Добавить</button>
+    </form>
+    {% for m in g.members %}
+    <div class="inline-form" style="justify-content:space-between;border-top:1px solid var(--line);padding:8px 0">
+      <span><a href="/admin/people/{{ m.id }}"><b>{{ m.display_name }}</b></a> <span class="small muted">{% if m.username %}@{{ m.username }}{% endif %} · {{ role_title(effective_role(m)) }}</span></span>
+      <form method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="remove_member"><input type="hidden" name="user_id" value="{{ m.id }}"><button class="btn btn--sm btn--danger">Убрать</button></form>
+    </div>
+    {% else %}<p class="muted small">Пока пусто.</p>{% endfor %}
+  </div>
+
+  <form method="post" class="panel">
+    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="save">
+    <h2 class="h3">Настройки и права</h2>
+    <div class="form-grid">
+      <label class="field"><span>Название</span><input name="name" value="{{ g.name }}" required></label>
+      <label class="field"><span>Действует до (пусто = бессрочно)</span><input type="datetime-local" name="expires_at" value="{{ g.expires_at.strftime('%Y-%m-%dT%H:%M') if g.expires_at else '' }}"></label>
+      <label class="field field--wide"><span>Описание</span><input name="description" value="{{ g.description or '' }}"></label>
+      <label class="check field--wide"><input type="checkbox" name="is_flow" value="1" {{ 'checked' if g.is_flow }}> <span><b>Это поток</b> — ведём журнал посещаемости</span></label>
+    </div>
+    <div class="perm-grid">{% for key, title in PERMISSIONS.items() %}<label><input type="checkbox" name="permissions" value="{{ key }}" {{ 'checked' if key in (g.permissions or []) }}> {{ title }}</label>{% endfor %}</div>
+    <button class="btn">Сохранить</button>
+  </form>
+
+  <div class="inline-form">
+    {% if g.is_active %}<form method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="close"><button class="btn btn--ghost btn--sm">Закрыть группу сейчас</button></form>{% endif %}
+    <form method="post" onsubmit="return confirm('Удалить группу «{{ g.name }}»? Участники останутся на сайте, но потеряют права группы.')"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="delete"><button class="btn btn--danger btn--sm">Удалить группу</button></form>
+  </div>
+</div>
+{% endblock %}

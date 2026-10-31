@@ -1,0 +1,35 @@
+services:
+  web:
+    build: .
+    env_file: .env
+    volumes:
+      - ./data:/srv/data
+    restart: unless-stopped
+
+  bot:
+    build: .
+    command: python bot.py
+    env_file: .env
+    volumes:
+      - ./data:/srv/data
+    restart: unless-stopped
+    depends_on: [web]
+
+  # Веб-сервер с автоматическим HTTPS (Let's Encrypt). Нужен домен, направленный на VPS.
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - SITE_DOMAIN=${SITE_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    depends_on: [web]
+
+volumes:
+  caddy_data:
+  caddy_config:

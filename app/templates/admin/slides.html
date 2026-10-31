@@ -1,0 +1,32 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Слайдер — ENERGY{% endblock %}
+{% block admin %}
+<h1>Слайдер на главной</h1>
+<p class="muted small">Фото показываются по порядку (меньшее число — раньше). После фото всегда идут три брендовых слайда про субботы, выезд и команды. Лучше всего — горизонтальные фото от 1600 px.</p>
+{% if error %}<p class="err-box">{{ error }}</p>{% endif %}
+<form method="post" enctype="multipart/form-data" class="panel" style="margin-bottom:20px">
+  <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="add">
+  <div class="form-grid">
+    <label class="field"><span>Фото *</span><input type="file" name="image" accept="image/*" required></label>
+    <label class="field"><span>Порядок</span><input type="number" name="sort" value="0"></label>
+    <label class="field"><span>Заголовок</span><input name="title" placeholder="Вожатский выезд, май 2026"></label>
+    <label class="field"><span>Подпись</span><input name="caption"></label>
+  </div>
+  <button class="btn" style="margin-top:12px">Добавить фото</button>
+</form>
+<div class="game-grid">
+  {% for s in slides %}
+  <form method="post" class="panel" style="padding:12px">
+    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="id" value="{{ s.id }}">
+    <img src="/media/slides/{{ s.image }}" alt="" style="width:100%;height:160px;object-fit:cover;border-radius:12px;{{ 'opacity:.4' if not s.is_active }}">
+    <div class="stack" style="margin-top:10px">
+      <input class="input" name="title" value="{{ s.title }}" placeholder="Заголовок" aria-label="Заголовок">
+      <input class="input" name="caption" value="{{ s.caption }}" placeholder="Подпись" aria-label="Подпись">
+      <div class="inline-form"><input type="number" name="sort" value="{{ s.sort }}" style="width:80px" aria-label="Порядок">
+        <select name="is_active" aria-label="Показывать"><option value="1" {{ 'selected' if s.is_active }}>Показывать</option><option value="0" {{ 'selected' if not s.is_active }}>Скрыто</option></select></div>
+      <div class="inline-form"><button class="btn btn--sm" name="action" value="save">Сохранить</button><button class="btn btn--sm btn--danger" name="action" value="delete" onclick="return confirm('Удалить фото?')">Удалить</button></div>
+    </div>
+  </form>
+  {% else %}<div class="panel empty">Фото пока нет — на главной показываются только брендовые слайды.</div>{% endfor %}
+</div>
+{% endblock %}

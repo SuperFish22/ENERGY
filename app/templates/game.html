@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ g.title }} — {{ g.section|lower }} | Игротека ENERGY{% endblock %}
+{% block description %}{{ g.title }}: {{ g.body|excerpt(150) }}{% endblock %}
+{% block robots %}{% if not g.is_public or g.status != 'published' %}<meta name="robots" content="noindex">{% endif %}{% endblock %}
+{% block content %}
+<section class="page"><div class="wrap">
+  <p class="crumbs"><a href="/igroteka">Игротека</a> → <a href="/igroteka?razdel={{ g.section|urlencode }}">{{ g.section }}</a></p>
+  <h1>{{ g.title }}</h1>
+  {% if g.status != 'published' %}<p class="notice">Статус: {{ PUB_STATUSES[g.status] }}. Игру видят только автор и руководители.</p>{% endif %}
+  <div class="article">
+    <article class="article__body">{{ g.body|md }}</article>
+    <aside class="aside">
+      <div class="panel">
+        <dl class="meta-list">
+          <div><dt>Раздел</dt><dd>{{ g.section }}</dd></div>
+          {% if g.ages %}<div><dt>Возраст</dt><dd>{% for a in g.ages %}<i class="age age--{{ a }}">{{ a }}</i> {% endfor %}</dd></div>{% endif %}
+          {% if g.players %}<div><dt>Участники</dt><dd>{{ g.players }}</dd></div>{% endif %}
+          {% if g.duration %}<div><dt>Время</dt><dd>{{ g.duration }}</dd></div>{% endif %}
+          {% if g.place %}<div><dt>Где</dt><dd>{{ g.place }}</dd></div>{% endif %}
+          {% if g.props %}<div><dt>Реквизит</dt><dd>{{ g.props }}</dd></div>{% endif %}
+        </dl>
+        {% if user and has_perm(user, 'playroom.edit') %}<a href="/admin/games/{{ g.id }}" class="btn btn--ghost btn--sm" style="margin-top:14px">Редактировать</a>{% endif %}
+      </div>
+      {% include "_rating.html" %}
+    </aside>
+  </div>
+  {% if same %}
+  <h2 class="h3" style="margin-top:36px">Ещё из раздела «{{ g.section }}»</h2>
+  <div class="game-grid">{% for g in same %}{% include "_game_card.html" %}{% endfor %}</div>
+  {% endif %}
+</div></section>
+{% endblock %}

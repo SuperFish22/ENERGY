@@ -1,0 +1,37 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Группы и права — ENERGY{% endblock %}
+{% block admin %}
+<h1>Группы и права</h1>
+<p class="muted small">Группа — это поток, отряд или команда на мероприятие. Участники получают права группы, пока она активна. Когда срок закончится, права исчезнут сами.</p>
+<div class="stack">
+  <details class="panel" {{ 'open' if not groups }}>
+    <summary style="cursor:pointer;font-weight:800">+ Новая группа</summary>
+    <form method="post" action="/admin/groups" style="margin-top:16px">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <div class="form-grid">
+        <label class="field"><span>Название *</span><input name="name" required placeholder="Осенний поток 2026"></label>
+        <label class="field"><span>Действует до (пусто = бессрочно)</span><input type="datetime-local" name="expires_at"></label>
+        <label class="field field--wide"><span>Описание</span><input name="description" placeholder="Для чего группа"></label>
+        <label class="check field--wide"><input type="checkbox" name="is_flow" value="1"> <span><b>Это поток</b> — по группе ведётся журнал посещаемости, а занятия идут в шкалу развития</span></label>
+      </div>
+      <p style="font-weight:800;margin:16px 0 0">Права участников</p>
+      <div class="perm-grid">{% for key, title in PERMISSIONS.items() %}<label><input type="checkbox" name="permissions" value="{{ key }}"> {{ title }}</label>{% endfor %}</div>
+      <button class="btn">Создать группу</button>
+    </form>
+  </details>
+
+  {% if groups %}
+  <div class="table-wrap"><table>
+    <tr><th>Группа</th><th>Участники</th><th>Права</th><th>Срок</th></tr>
+    {% for g in groups %}
+    <tr>
+      <td><a href="/admin/groups/{{ g.id }}"><b>{{ g.name }}</b></a>{% if g.is_flow %} <span class="chip chip--orange">поток</span>{% endif %}{% if g.description %}<div class="small muted">{{ g.description }}</div>{% endif %}</td>
+      <td>{{ g.members|length }}</td>
+      <td class="small">{{ g.permissions|length }} шт.</td>
+      <td>{% if not g.is_active %}<span class="status status--rejected">Закрыта</span>{% elif g.expires_at %}до {{ g.expires_at|dt }}{% else %}<span class="muted">бессрочно</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table></div>
+  {% endif %}
+</div>
+{% endblock %}

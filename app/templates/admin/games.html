@@ -1,0 +1,23 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Игротека — админка ENERGY{% endblock %}
+{% block admin %}
+<div class="section-head"><h1 style="margin:0">Игротека</h1><a class="btn btn--sm" href="/admin/games/new">+ Новая игра</a></div>
+<div class="toolbar">
+  <form class="inline-form">
+    <input name="q" value="{{ q }}" placeholder="Название">
+    <select name="razdel"><option value="">Все разделы</option>{% for s in GAME_SECTIONS %}<option {{ 'selected' if razdel == s }}>{{ s }}</option>{% endfor %}</select>
+    <select name="status"><option value="">Любой статус</option>{% for k, v in PUB_STATUSES.items() %}<option value="{{ k }}" {{ 'selected' if status == k }}>{{ v }}</option>{% endfor %}</select>
+    <button class="btn btn--sm">Показать</button>
+  </form>
+</div>
+<p class="muted small">Игр: {{ games|length }}</p>
+<div class="table-wrap"><table>
+  <tr><th>Игра</th><th>Раздел</th><th>Возраст</th><th>Доступ</th><th>Статус</th></tr>
+  {% for g in games %}<tr>
+    <td><a href="/admin/games/{{ g.id }}"><b>{{ g.title }}</b></a> <a href="/igroteka/{{ g.slug }}" class="small" target="_blank">↗</a></td>
+    <td class="small">{{ g.section }}</td><td class="small">{{ (g.ages or [])|join(', ') }}</td>
+    <td class="small">{{ 'открытая' if g.is_public else 'для команды' }}</td>
+    <td><span class="status status--{{ {'draft':'rejected','pending':'new','published':'enrolled','rejected':'rejected'}[g.status] }}">{{ PUB_STATUSES[g.status] }}</span></td>
+  </tr>{% endfor %}
+</table></div>
+{% endblock %}

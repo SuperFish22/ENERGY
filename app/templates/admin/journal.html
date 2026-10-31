@@ -1,0 +1,43 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Журнал потока — ENERGY{% endblock %}
+{% block admin %}
+<h1>Журнал потока</h1>
+{% if not flows %}
+<div class="panel empty">Нет ни одного потока. Создайте группу в разделе «Группы и права» и отметьте «Это поток».</div>
+{% else %}
+<nav class="filters" style="margin-top:0">{% for f in flows %}<a href="?group={{ f.id }}" class="{{ 'is-active' if g and f.id == g.id }}">{{ f.name }}{% if not f.is_active %} (закрыт){% endif %}</a>{% endfor %}</nav>
+<div class="grid-2" style="margin:16px 0">
+  <div class="panel">
+    <h2 class="h3">Занятия ({{ g.lessons|length }})</h2>
+    {% for l in g.lessons %}
+    <div class="inline-form" style="justify-content:space-between;border-top:1px solid var(--line);padding:8px 0">
+      <span><b>{{ l.date.strftime('%d.%m') }}</b> {{ l.title }}{% if l.is_exam %} <span class="chip chip--orange">аттестация</span>{% endif %}</span>
+      <span class="inline-form"><a class="btn btn--sm" href="/admin/journal/{{ g.id }}/lesson/{{ l.id }}">Отметить</a>
+      <form method="post" action="/admin/journal/{{ g.id }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="lesson_id" value="{{ l.id }}"><button class="btn btn--sm btn--danger" name="action" value="delete_lesson" onclick="return confirm('Удалить занятие и отметки?')">×</button></form></span>
+    </div>
+    {% else %}<p class="muted small">Добавьте занятия потока — обычно их 8.</p>{% endfor %}
+  </div>
+  <form method="post" action="/admin/journal/{{ g.id }}" class="panel stack">
+    <h2 class="h3">+ Занятие</h2>
+    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="add_lesson">
+    <label class="field"><span>Дата</span><input type="date" name="date" value="{{ today }}" required></label>
+    <label class="field"><span>Тема</span><input name="title" placeholder="Знакомство и тактильный барьер"></label>
+    <label class="check"><input type="checkbox" name="is_exam" value="1"> <span>Аттестационное занятие</span></label>
+    <button class="btn btn--sm">Добавить</button>
+  </form>
+</div>
+
+<h2 class="h3">Энерты потока</h2>
+{% if rows %}
+<div class="table-wrap"><table class="att-table">
+  <tr><th>Энерт</th>{% for l in g.lessons %}<th title="{{ l.title }}">{{ l.date.strftime('%d.%m') }}</th>{% endfor %}<th>Шкала</th></tr>
+  {% for u, p in rows %}<tr>
+    <td><a href="/admin/people/{{ u.id }}"><b>{{ u.display_name }}</b></a>{% if p.absent > 3 %} <span class="status status--rejected">{{ p.absent }} нб</span>{% endif %}</td>
+    {% for l in g.lessons %}{% set m = marks.get((l.id, u.id)) %}<td>{% if not m %}<span class="muted">·</span>{% elif m.present %}<span class="att-yes">✓</span>{% elif m.excused %}<span class="att-exc" title="предупредил">у</span>{% else %}<span class="att-no">нб</span>{% endif %}</td>{% endfor %}
+    <td><b>{{ p.total }}%</b></td>
+  </tr>{% endfor %}
+</table></div>
+<p class="small muted">✓ — был, нб — не был, у — не был, но предупредил. Нажмите на имя, чтобы поставить зачёты игротеки, баллы, выезд и аттестацию.</p>
+{% else %}<div class="panel empty">В потоке пока никого. Добавьте участников в группе.</div>{% endif %}
+{% endif %}
+{% endblock %}

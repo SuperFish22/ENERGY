@@ -1,0 +1,13 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Оценочные листы — ENERGY{% endblock %}
+{% block admin %}
+<h1>Оценочные листы</h1>
+<p class="muted small">Средние оценки педсостава по критериям ENERGY PRO. Чтобы оценить человека, откройте его карточку.</p>
+{% if people %}
+<div class="table-wrap"><table>
+  <tr><th>Человек</th>{% for c in criteria %}<th style="font-size:.7rem">{{ c }}</th>{% endfor %}</tr>
+  {% for u in people %}<tr><td><a href="/admin/people/{{ u.id }}"><b>{{ u.display_name }}</b></a><div class="small muted">{{ role_title(effective_role(u)) }}</div></td>
+    {% for c in criteria %}<td>{{ avg.get(u.id, {}).get(c, '·') }}</td>{% endfor %}</tr>{% endfor %}
+</table></div>
+{% else %}<div class="panel empty">Пока нет людей с ролями педсостава. Назначьте роли в «Люди и роли».</div>{% endif %}
+{% endblock %}

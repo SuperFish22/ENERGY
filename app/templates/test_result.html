@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Результат — {{ test.title }} | ENERGY{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block content %}
+<section class="page"><div class="wrap" style="max-width:820px">
+  <div class="panel result-hero">
+    <p class="kicker">{{ test.title }}</p>
+    {% if a.needs_review %}<b style="color:var(--orange)">На проверке</b><p class="muted">В тесте есть открытые вопросы — мастер проверит их и поставит зачёт.</p>
+    {% elif a.passed %}<b style="color:var(--green)">Зачёт ⚡️</b><p class="muted">Тест засчитан и уже на твоей шкале развития.</p>
+    {% else %}<b style="color:#c0392b">Незачёт</b><p class="muted">Нужно {{ test.pass_percent }}% — перечитай материал и попробуй ещё раз.</p>{% endif %}
+    <p><b style="font-size:1.4rem;display:inline">{{ '%g'|format(a.score) }} / {{ '%g'|format(a.max_score) }}</b> баллов</p>
+    {% if a.reviewer_note %}<p class="notice">Комментарий мастера: {{ a.reviewer_note }}</p>{% endif %}
+    <div class="hero__cta" style="justify-content:center"><a class="btn" href="/cabinet">В кабинет</a>{% if test.is_open and not a.passed %}<a class="btn btn--ghost" href="/t/{{ test.token }}">Пройти ещё раз</a>{% endif %}</div>
+  </div>
+  {% if test.show_answers %}
+  <h2 class="h3" style="margin-top:28px">Разбор ответов</h2>
+  {% for q in test.questions %}{% set ans = a.answers[loop.index0] if loop.index0 < a.answers|length else {} %}
+  <div class="test-q"><b>{{ loop.index }}. {{ q.text }}</b>
+    {% if q.type == 'text' %}<p class="small">{{ ans.value or '—' }}</p>
+    {% else %}{% for o in q.options %}{% set mine = loop.index0 in (ans.value or []) %}{% set right = loop.index0 in q.correct %}
+      <div class="opt {{ 'opt--ok' if right else ('opt--bad' if mine) }}">{{ '✔' if mine else '·' }} {{ o }}</div>{% endfor %}{% endif %}
+  </div>{% endfor %}
+  {% endif %}
+</div></section>
+{% endblock %}

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Визитка — Школа вожатых ENERGY</title>
+  <meta name="description" content="Школа вожатых ENERGY в нескольких слайдах: кто мы, как проходит поток, чему учим и как записаться.">
+  <link rel="canonical" href="{{ config.SITE_URL }}/">
+  <link rel="icon" href="/static/img/favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css?v=2">
+  <link rel="stylesheet" href="/static/css/vizitka.css?v=1">
+</head>
+<body class="vz-body">
+  <header class="vz-top">
+    <a class="brand" href="/"><img src="/static/img/logo-mark.png" alt="" width="40" height="40"><span class="brand__txt"><b>ENERGY</b><small>школа вожатых</small></span></a>
+    <span class="vz-hint">листайте колесом или стрелками ↓</span>
+    <a class="btn btn--ghost btn--sm" href="/">Обычный сайт</a>
+  </header>
+  <nav class="vz-dots" aria-label="Слайды"></nav>
+
+  <main class="vz" id="vz">
+    <section class="vz-s vz-s--hero" data-title="ENERGY">
+      <div class="vz-in vz-grid">
+        <div>
+          <p class="kicker">Педагогический отряд · с 2014 года</p>
+          <h1>Школа вожатых <span class="hl">ENERGY</span></h1>
+          <ul class="hero__asks">
+            <li><i class="dot dot--green"></i>Хочешь стать вожатым?</li>
+            <li><i class="dot dot--orange"></i>Хочешь стать старшим вожатым или организатором мероприятий?</li>
+            <li><i class="dot dot--blue"></i>Хочешь прокачать свои вожатские навыки?</li>
+          </ul>
+          <p class="vz-big">Присоединяйся к нам!</p>
+        </div>
+        <div class="hero__art"><div class="orbit"><span class="orbit__spark"></span></div><img src="/static/img/logo.png" alt="ENERGY" class="hero__logo"></div>
+      </div>
+    </section>
+
+    <section class="vz-s vz-s--green" data-title="Кто мы">
+      <div class="vz-in">
+        <p class="kicker kicker--light">Кто мы</p>
+        <h2>Мы не просто обучаем — мы делимся образом жизни и идеями</h2>
+        <div class="vz-nums">
+          <div><b>2014</b><span>год основания</span></div>
+          <div><b>3000+</b><span>выпускников</span></div>
+          <div><b>10+</b><span>лет работы с лагерями</span></div>
+        </div>
+        <p class="vz-text">Обучаем вожатых, старших вожатых, методистов, организаторов мероприятий и аниматоров. Наши выпускники работают от детских лагерей до больших государственных институций.</p>
+      </div>
+    </section>
+
+    <section class="vz-s" data-title="Поток">
+      <div class="vz-in">
+        <p class="kicker">Как проходит обучение</p>
+        <h2>2 месяца, которые меняют лето</h2>
+        <div class="vz-cards">
+          <div><b>8 суббот</b><span>7 занятий и аттестация</span></div>
+          <div><b>Команды</b><span>мастер и 2 куратора, как в отряде</span></div>
+          <div><b>Тесты</b><span>после каждого занятия, зачёт / незачёт</span></div>
+          <div><b>Выезд</b><span>обязательный, 3 дня в лагере</span></div>
+          <div><b>Сертификат</b><span>после аттестации</span></div>
+          <div><b>Работа</b><span>помогаем устроиться минимум на одну смену</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="vz-s vz-s--tint" data-title="Суббота">
+      <div class="vz-in vz-grid">
+        <div>
+          <p class="kicker">Одна суббота в ENERGY</p>
+          <h2>Четыре часа настоящей лагерной жизни</h2>
+          <p class="vz-text">Каждое занятие — это раздел игротеки, теория, вечерка по одному из творческих направлений лагеря и свечка.</p>
+        </div>
+        <ol class="timeline timeline--big">
+          <li><time>16:30</time><span>Игротека</span></li>
+          <li><time>17:15</time><span>Теория</span></li>
+          <li><time>18:40</time><span>Вечерка: визитки, дэнс-баттлы, музыкалки</span></li>
+          <li><time>19:50</time><span>Свечка</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="vz-s" data-title="Программа">
+      <div class="vz-in">
+        <p class="kicker">Программа</p>
+        <h2>Чему научим</h2>
+        <ul class="vz-tags">
+          <li>Возрастные особенности</li><li>Личность вожатого</li><li>Мероприятия и КТД</li><li>Периодизация смены</li>
+          <li>Право и первая помощь</li><li>Конфликтология</li><li>Инклюзия</li><li>Игротека: 9 разделов</li>
+        </ul>
+        {% if games_count %}<p class="vz-text">А ещё — <a href="/igroteka">открытая игротека</a> на {{ games_count }} игр, которой может пользоваться любой вожатый.</p>{% endif %}
+      </div>
+    </section>
+
+    {% if slides %}
+    <section class="vz-s vz-s--photo" data-title="Фото">
+      <div class="slider slider--full" id="slider" data-autoplay="5000">
+        <div class="slider__track">
+          {% for s in slides %}
+          <figure class="slide"><img src="/media/slides/{{ s.image }}" alt="{{ s.title or 'ENERGY' }}">
+            {% if s.title or s.caption %}<figcaption><b>{{ s.title }}</b>{% if s.caption %}<span>{{ s.caption }}</span>{% endif %}</figcaption>{% endif %}
+          </figure>
+          {% endfor %}
+        </div>
+        <button class="slider__btn slider__btn--prev" type="button" aria-label="Предыдущее фото">‹</button>
+        <button class="slider__btn slider__btn--next" type="button" aria-label="Следующее фото">›</button>
+        <div class="slider__dots"></div>
+      </div>
+    </section>
+    {% endif %}
+
+    <section class="vz-s vz-s--dark" data-title="PRO">
+      <div class="vz-in">
+        <p class="kicker kicker--light">Для педсостава</p>
+        <h2>ENERGY PRO</h2>
+        <p class="vz-text">Круглогодичное повышение квалификации: орг-группа, кураторство, СМИ. Программу собирает сама группа — из своих реальных запросов.</p>
+        <ul class="tags"><li>Конфликты в педсоставе</li><li>Особенные дети</li><li>Мотивация</li><li>Рефлексия и свечки</li><li>SOS-ситуации</li></ul>
+      </div>
+    </section>
+
+    <section class="vz-s vz-s--orange" data-title="Запись">
+      <div class="vz-in center">
+        <h2>Стань частью ENERGY</h2>
+        <p class="vz-big">ENERGY. Дерзай!</p>
+        <div class="hero__cta" style="justify-content:center">
+          <a href="/#zayavka" class="btn btn--light btn--lg">Записаться на поток</a>
+          <a href="{{ config.VK_URL }}" class="btn btn--ghost-light btn--lg" target="_blank" rel="noopener">ВКонтакте</a>
+          {% if config.TG_CHANNEL_URL %}<a href="{{ config.TG_CHANNEL_URL }}" class="btn btn--ghost-light btn--lg" target="_blank" rel="noopener">Телеграм-канал</a>{% endif %}
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="/static/js/main.js?v=2" defer></script>
+  <script src="/static/js/vizitka.js?v=1" defer></script>
+</body>
+</html>

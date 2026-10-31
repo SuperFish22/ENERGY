@@ -1,0 +1,14 @@
+<div class="panel" id="otzyvy">
+  <h2 class="h3">Оценки вожатых {% if rating_avg %}<span class="stars-mini">★ {{ rating_avg }} · {{ rating_rows|length }}</span>{% endif %}</h2>
+  {% if user and has_perm(user, 'kb.rate') %}
+  <form method="post" action="/rate/{{ rating_kind }}/{{ rating_obj }}" class="rating-form">
+    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="back" value="{{ request.url.path }}">
+    <div class="stars" role="radiogroup" aria-label="Оценка">
+      {% for n in [5,4,3,2,1] %}<input type="radio" name="stars" value="{{ n }}" id="st{{ n }}" {{ 'checked' if rating_mine and rating_mine.stars == n }}><label for="st{{ n }}" title="{{ n }}">★</label>{% endfor %}
+    </div>
+    <textarea name="comment" id="rate-comment" rows="2" class="input" placeholder="Как прошло у вас? Что добавить?">{{ rating_mine.comment if rating_mine else '' }}</textarea>
+    <button class="btn btn--sm">{{ 'Обновить оценку' if rating_mine else 'Оценить' }}</button>
+  </form>
+  {% elif not user %}<p class="small muted">Оценивать могут вожатые ENERGY — <a href="/login?next={{ request.url.path }}">войдите через Telegram</a>.</p>{% endif %}
+  {% for r in rating_rows[:8] %}{% if r.comment %}<div class="review"><b>{{ '★' * r.stars }}</b> {{ r.comment }} <span class="muted small">— {{ r.user.first_name or 'вожатый' }}</span></div>{% endif %}{% endfor %}
+</div>

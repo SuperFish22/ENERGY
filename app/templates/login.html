@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Вход — {{ config.SITE_NAME }}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="page"><div class="wrap">
+  <div class="panel login-box">
+    <img src="/static/img/logo.png" alt="" width="140">
+    <h1 class="h3" style="font-size:1.5rem">Вход в личный кабинет</h1>
+    <p class="muted">Входи через Telegram — без паролей. Кабинет для энертов, мастеров, оргов и всей команды ENERGY.</p>
+    {% if config.BOT_USERNAME %}
+      <script async src="https://telegram.org/js/telegram-widget.js?22"
+        data-telegram-login="{{ config.BOT_USERNAME }}" data-size="large" data-radius="14"
+        data-auth-url="{{ config.SITE_URL }}/auth/telegram" data-request-access="write"></script>
+    {% else %}
+      <p class="notice">Вход через Telegram ещё не настроен: впишите <b>BOT_TOKEN</b> и <b>BOT_USERNAME</b> в файл .env.</p>
+    {% endif %}
+    {% if config.DEV_LOGIN %}
+      <hr style="border:0;border-top:1px solid var(--line);margin:24px 0">
+      <p class="small muted">Режим разработки</p>
+      <a class="btn btn--ghost btn--sm" href="/auth/dev?tg_id=1&name=Тестовый энерт">Войти как тестовый пользователь</a>
+    {% endif %}
+  </div>
+</div></section>
+{% endblock %}

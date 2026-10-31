@@ -1,0 +1,44 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Люди и роли — ENERGY{% endblock %}
+{% block admin %}
+<h1>Люди и роли</h1>
+<p class="muted small">Человек появляется здесь после первого входа на сайт через Telegram. Роль даёт постоянные права, группы — временные.</p>
+<div class="toolbar">
+  <form class="inline-form">
+    <input name="q" value="{{ q }}" placeholder="Имя или @ник">
+    <select name="role"><option value="">Все роли</option>{% for key, r in ROLES.items() %}<option value="{{ key }}" {{ 'selected' if role == key }}>{{ r.title }}</option>{% endfor %}</select>
+    <button class="btn btn--sm">Найти</button>
+  </form>
+</div>
+{% if people %}
+<div class="table-wrap"><table>
+  <tr><th>Человек</th><th>Telegram</th><th>Группы</th><th>Роль</th><th>Доступ</th></tr>
+  {% for u in people %}
+  <tr>
+    <td><a href="/admin/people/{{ u.id }}"><b>{{ u.display_name }}</b></a><div class="small muted">с {{ u.created_at|dt(False) }}</div></td>
+    <td class="small">{% if u.username %}@{{ u.username }}<br>{% endif %}<span class="muted">id {{ u.tg_id }}</span></td>
+    <td>{% for g in u.groups if g.is_active %}<span class="chip chip--blue">{{ g.name }}</span>{% else %}<span class="muted small">—</span>{% endfor %}</td>
+    <td>
+      {% if u.tg_id in config.SUPERADMIN_IDS %}<span class="chip">Руководитель (главный админ)</span>
+      {% else %}
+      <form method="post" action="/admin/users/{{ u.id }}" class="inline-form">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="back" value="{{ request.url }}">
+        <select name="role">{% for key, r in ROLES.items() %}<option value="{{ key }}" {{ 'selected' if u.role == key }}>{{ r.title }}</option>{% endfor %}</select>
+        <button class="btn btn--sm">OK</button>
+      </form>
+      {% endif %}
+    </td>
+    <td>
+      {% if u.id != user.id and u.tg_id not in config.SUPERADMIN_IDS %}
+      <form method="post" action="/admin/users/{{ u.id }}" class="inline-form">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="back" value="{{ request.url }}">
+        <input type="hidden" name="is_active" value="{{ '0' if u.is_active else '1' }}">
+        <button class="btn btn--sm {{ 'btn--danger' if u.is_active else 'btn--ghost' }}">{{ 'Заблокировать' if u.is_active else 'Вернуть доступ' }}</button>
+      </form>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% else %}<div class="panel empty">Никого не нашли.</div>{% endif %}
+{% endblock %}
