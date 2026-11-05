@@ -3,7 +3,7 @@
 Сайт педагогического отряда ENERGY: лендинг с записью на обучение, личный кабинет с входом через Telegram,
 админка с ролями и временными группами, Телеграм-бот для заявок.
 
-**Стек:** FastAPI + SQLite (SQLAlchemy) + Jinja2, бот на aiogram 3, Docker + Caddy (автоматический HTTPS).
+**Стек:** FastAPI + SQLite (SQLAlchemy) + Jinja2, бот на aiogram 3, nginx + certbot (HTTPS), systemd или Docker.
 
 ## Что есть
 
@@ -53,13 +53,7 @@ http://localhost:8000/auth/dev?tg_id=1&name=Admin.
 
 ## Запуск на VPS
 
-1. Направьте домен (A-запись) на IP сервера. Установите Docker.
-2. Создайте бота в @BotFather, затем `/setdomain` → ваш домен (без этого вход через Telegram не заработает).
-3. Скопируйте проект на сервер, сделайте `cp .env.example .env` и заполните его. `DEV_LOGIN=0`!
-4. Добавьте бота в чат организаторов, запустите его и напишите в чате `/chatid`, затем впишите id в `LEADS_CHAT_ID`.
-5. `docker compose up -d --build`
-
-База лежит в `./data/energy.db`. Бэкап — это копия этого файла.
+nginx на сервере + сайт и бот через systemd или Docker. Готовые файлы — в папке `deploy/`, пошагово — в [docs/ДОКУМЕНТАЦИЯ.md](docs/ДОКУМЕНТАЦИЯ.md), раздел 8.
 
 ## Структура
 

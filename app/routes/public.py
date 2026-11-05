@@ -236,7 +236,8 @@ async def create_lead(request: Request, bg: BackgroundTasks, db: Session = Depen
     age_raw = str(form.get("age", "")).strip()
     age = int(age_raw) if age_raw.isdigit() and 12 <= int(age_raw) <= 99 else None
 
-    ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "?").split(",")[0]
+    # nginx кладёт настоящий адрес посетителя в X-Real-IP (X-Forwarded-For можно подделать)
+    ip = request.headers.get("x-real-ip") or (request.client.host if request.client else "?")
     if _rate_limited(ip):
         return fail("Слишком много заявок подряд. Попробуйте позже.", 429)
 
