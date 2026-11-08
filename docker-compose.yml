@@ -1,5 +1,6 @@
-# Сайт и бот в Docker. Снаружи их закрывает nginx на самом сервере (deploy/nginx/energy.conf).
+# Сайт в Docker. Снаружи его закрывает nginx на самом сервере (deploy/nginx/energy.conf).
 # Порт 8000 открыт только для localhost — из интернета к нему не подключиться напрямую.
+# Телеграм-бот живёт на другом сервере — см. папку bot/.
 services:
   web:
     build: .
@@ -9,12 +10,3 @@ services:
     volumes:
       - ./data:/srv/data
     restart: unless-stopped
-
-  bot:
-    build: .
-    command: python bot.py
-    env_file: .env
-    volumes:
-      - ./data:/srv/data
-    restart: unless-stopped
-    depends_on: [web]

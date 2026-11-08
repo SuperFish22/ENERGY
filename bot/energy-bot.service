@@ -1,0 +1,18 @@
+# Бот ENERGY без Docker. Положить в /etc/systemd/system/, затем:
+#   sudo systemctl daemon-reload && sudo systemctl enable --now energy-bot
+[Unit]
+Description=ENERGY — Telegram-бот
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=energybot
+Group=energybot
+WorkingDirectory=/opt/energy-bot
+EnvironmentFile=/opt/energy-bot/.env
+ExecStart=/opt/energy-bot/.venv/bin/python bot.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

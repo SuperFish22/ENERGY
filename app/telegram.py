@@ -76,7 +76,9 @@ def lead_keyboard(lead_id: int) -> dict:
 
 
 async def notify_new_lead(lead: Lead) -> None:
-    if not config.LEADS_CHAT_ID:
+    """Отправка заявки прямо с сайта — только если бот не вынесен на отдельный сервер.
+    Если задан BOT_API_TOKEN, заявку заберёт бот через /api/bot/leads/pending."""
+    if config.BOT_API_TOKEN or not config.LEADS_CHAT_ID:
         return
     payload = {
         "chat_id": config.LEADS_CHAT_ID,

@@ -1,0 +1,6 @@
+# Бот ENERGY на отдельном сервере. Запуск: docker compose up -d --build
+services:
+  bot:
+    build: .
+    env_file: .env
+    restart: unless-stopped

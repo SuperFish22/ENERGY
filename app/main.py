@@ -9,7 +9,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from . import config
 from .db import SessionLocal, init_db
-from .routes import admin, admin_content, admin_school, auth, cabinet, constructors, public, tests
+from .routes import admin, admin_content, admin_school, auth, bot_api, cabinet, constructors, public, tests
 from .web import current_user, render
 
 @asynccontextmanager
@@ -32,7 +32,7 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory=str(config.BASE_DIR / "static")), name="static")
 
 for r in (public.router, auth.router, cabinet.router, tests.router, constructors.router,
-          admin.router, admin_content.router, admin_school.router):
+          admin.router, admin_content.router, admin_school.router, bot_api.router):
     app.include_router(r)
 
 

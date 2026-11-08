@@ -18,6 +18,15 @@ engine = create_engine(
     config.DATABASE_URL,
     connect_args={"check_same_thread": False} if config.DATABASE_URL.startswith("sqlite") else {},
 )
+if config.DATABASE_URL.startswith("sqlite"):
+    from sqlalchemy import event
+
+    @event.listens_for(engine, "connect")
+    def _sqlite_unicode_lower(dbapi_conn, _record):
+        # Встроенный lower() в SQLite понимает только латиницу, из-за этого поиск без учёта
+        # регистра (ilike) не находил «Знакомство» по запросу «знакомство». Подменяем на питоновский.
+        dbapi_conn.create_function("lower", 1, lambda v: v.lower() if isinstance(v, str) else v, deterministic=True)
+
 SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 Base = declarative_base()
 
@@ -101,6 +110,7 @@ class Lead(Base):
     course = Column(String(32), default="vozhatiy")
     status = Column(String(16), default="new", index=True)
     admin_note = Column(Text, default="")
+    notified_at = Column(DateTime, nullable=True)  # когда бот отправил заявку в чат организаторов
     created_at = Column(DateTime, default=now, index=True)
     updated_at = Column(DateTime, default=now, onupdate=now)
 
@@ -361,5 +371,18 @@ class Construct(Base):
     author = relationship("User", foreign_keys=[author_id])
 
 
+# Колонки, добавленные после первого запуска: (таблица, колонка, тип SQL).
+# create_all не меняет уже существующие таблицы, поэтому добавляем их сами.
+_MIGRATIONS = [
+    ("leads", "notified_at", "DATETIME"),
+]
+
+
 def init_db() -> None:
     Base.metadata.create_all(engine)
+    from sqlalchemy import inspect, text
+    insp = inspect(engine)
+    with engine.begin() as conn:
+        for table, column, sql_type in _MIGRATIONS:
+            if column not in {c["name"] for c in insp.get_columns(table)}:
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {sql_type}"))

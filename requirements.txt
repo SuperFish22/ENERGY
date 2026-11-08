@@ -6,4 +6,3 @@ sqlalchemy==2.1.5
 python-dotenv==1.2.4
 python-multipart==0.0.20
 itsdangerous==2.2.0
-aiogram==3.22.0
