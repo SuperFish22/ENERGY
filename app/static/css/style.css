@@ -488,12 +488,27 @@ tr:target td { background: #fff8e6; }
 .as-banner__in { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 8px 0; font-weight: 600; }
 .as-banner .btn--light { color: var(--dark); }
 
-/* соцсети */
-.socials { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
-.soc { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 999px; background: var(--card); border: 1.5px solid var(--line); color: var(--ink); text-decoration: none; font-weight: 700; font-size: .92rem; transition: transform .15s, border-color .15s; }
-.soc:hover { transform: translateY(-2px); }
-.soc i { font-style: normal; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: #fff; font: 800 .72rem var(--body); letter-spacing: .02em; }
-.soc--vk i { background: #2787f5; } .soc--vk:hover { border-color: #2787f5; }
-.soc--tg i { background: #27a6e5; } .soc--tg:hover { border-color: #27a6e5; }
-.soc--ig i { background: linear-gradient(45deg, #f9a03f, #e1306c 55%, #8a3ab9); } .soc--ig:hover { border-color: #e1306c; }
-.socials--dark .soc { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); color: #fff; }
+/* соцсети. Иконки брендов — Font Awesome Free (CC BY 4.0, https://fontawesome.com),
+   лицензия: /static/fonts/FONTAWESOME-LICENSE.txt. Подключён только шрифт значков брендов. */
+@font-face { font-family: "FA Brands"; font-style: normal; font-weight: 400; font-display: block;
+  src: url(/static/fonts/fa-brands-400.woff2) format("woff2"); }
+.fab { font-family: "FA Brands"; font-style: normal; font-weight: 400; line-height: 1; -webkit-font-smoothing: antialiased; display: inline-block; }
+.fab-vk::before { content: "\f189"; }
+.fab-telegram::before { content: "\f2c6"; }
+.fab-instagram::before { content: "\f16d"; }
+
+.socials { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.soc { display: inline-flex; align-items: center; gap: 12px; padding: 8px 18px 8px 8px; border-radius: 18px; background: var(--card);
+  border: 1.5px solid var(--line); color: var(--ink); text-decoration: none; transition: transform .15s, box-shadow .15s, border-color .15s; }
+.soc:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.soc__ico { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; color: #fff; font-size: 1.45rem; flex: none; }
+.soc__txt { display: flex; flex-direction: column; line-height: 1.2; }
+.soc__txt b { font-weight: 800; font-size: .98rem; }
+.soc__txt small { color: var(--ink-2); font-size: .8rem; font-weight: 600; }
+.soc--vk .soc__ico { background: #0077ff; } .soc--vk:hover { border-color: #0077ff; }
+.soc--tg .soc__ico { background: #24a1de; } .soc--tg:hover { border-color: #24a1de; }
+.soc--ig .soc__ico { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%); }
+.soc--ig:hover { border-color: #d6249f; }
+.socials--dark .soc { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.16); color: #fff; }
+.socials--dark .soc__txt small { color: #9fb79e; }
+@media (max-width: 480px) { .socials { display: grid; grid-template-columns: 1fr; } .soc { width: 100%; } }

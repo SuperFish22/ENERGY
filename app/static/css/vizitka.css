@@ -52,3 +52,6 @@ html:has(.vz-body) { scroll-padding-top: 0; }
   .vz { scroll-snap-type: none; }
   .vz-grid .hero__art { display: none; }
 }
+.vz-socials .socials { justify-content: center; margin-top: 28px; }
+.vz-s--orange .socials--dark .soc { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.35); }
+.vz-s--orange .socials--dark .soc__txt small { color: #fff3e0; }

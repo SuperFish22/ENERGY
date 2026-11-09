@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css?v=2">
+  <link rel="stylesheet" href="/static/css/style.css?v=3">
   <link rel="stylesheet" href="/static/css/vizitka.css?v=1">
 </head>
 <body class="vz-body">
@@ -126,10 +126,8 @@
         <p class="vz-big">ENERGY. Дерзай!</p>
         <div class="hero__cta" style="justify-content:center">
           <a href="/#zayavka" class="btn btn--light btn--lg">Записаться на поток</a>
-          <a href="{{ config.VK_URL }}" class="btn btn--ghost-light btn--lg" target="_blank" rel="noopener">ВКонтакте</a>
-          {% if config.TG_CHANNEL_URL %}<a href="{{ config.TG_CHANNEL_URL }}" class="btn btn--ghost-light btn--lg" target="_blank" rel="noopener">Телеграм-канал</a>{% endif %}
-          {% if config.INSTAGRAM_URL %}<a href="{{ config.INSTAGRAM_URL }}" class="btn btn--ghost-light btn--lg" target="_blank" rel="noopener">Instagram</a>{% endif %}
         </div>
+        <div class="vz-socials">{% set socials_dark = true %}{% include "_socials.html" %}</div>
       </div>
     </section>
   </main>

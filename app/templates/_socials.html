@@ -1,6 +1,16 @@
-{# Ссылки на соцсети. variant: '' (светлый фон) или 'dark' (тёмный фон) #}
+{# Кнопки соцсетей. На тёмном фоне: {% set socials_dark = true %} перед include #}
+{% macro handle(url) %}@{{ url.split('?')[0].rstrip('/').split('/')[-1] }}{% endmacro %}
 <div class="socials {{ 'socials--dark' if socials_dark is defined and socials_dark }}">
-  <a class="soc soc--vk" href="{{ config.VK_URL }}" target="_blank" rel="noopener"><i aria-hidden="true">VK</i><span>ВКонтакте</span></a>
-  {% if config.TG_CHANNEL_URL %}<a class="soc soc--tg" href="{{ config.TG_CHANNEL_URL }}" target="_blank" rel="noopener"><i aria-hidden="true">TG</i><span>Telegram</span></a>{% endif %}
-  {% if config.INSTAGRAM_URL %}<a class="soc soc--ig" href="{{ config.INSTAGRAM_URL }}" target="_blank" rel="noopener"><i aria-hidden="true">IG</i><span>Instagram</span></a>{% endif %}
+  <a class="soc soc--vk" href="{{ config.VK_URL }}" target="_blank" rel="noopener" aria-label="Мы ВКонтакте">
+    <span class="soc__ico"><i class="fab fab-vk" aria-hidden="true"></i></span>
+    <span class="soc__txt"><b>Мы ВКонтакте</b><small>{{ handle(config.VK_URL) }}</small></span>
+  </a>
+  {% if config.TG_CHANNEL_URL %}<a class="soc soc--tg" href="{{ config.TG_CHANNEL_URL }}" target="_blank" rel="noopener" aria-label="Мы в Telegram">
+    <span class="soc__ico"><i class="fab fab-telegram" aria-hidden="true"></i></span>
+    <span class="soc__txt"><b>Мы в Telegram</b><small>{{ handle(config.TG_CHANNEL_URL) }}</small></span>
+  </a>{% endif %}
+  {% if config.INSTAGRAM_URL %}<a class="soc soc--ig" href="{{ config.INSTAGRAM_URL }}" target="_blank" rel="noopener" aria-label="Мы в Instagram">
+    <span class="soc__ico"><i class="fab fab-instagram" aria-hidden="true"></i></span>
+    <span class="soc__txt"><b>Мы в Instagram</b><small>{{ handle(config.INSTAGRAM_URL) }}</small></span>
+  </a>{% endif %}
 </div>
