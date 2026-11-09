@@ -53,6 +53,12 @@
     </div>
   </header>
 
+  {% if request.session.get('real_uid') and user %}
+  <div class="as-banner"><div class="wrap as-banner__in">
+    <span>👀 Вы смотрите сайт как <b>{{ user.display_name }}</b> ({{ role_title(effective_role(user)) }})</span>
+    <form method="post" action="/impersonate/stop"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn btn--sm btn--light">Вернуться к себе ({{ request.session.get('real_name') }})</button></form>
+  </div></div>
+  {% endif %}
   <main id="main">{% block content %}{% endblock %}</main>
 
   <footer class="footer">
@@ -60,12 +66,11 @@
       <div>
         <div class="footer__slogan">ENERGY. Дерзай!</div>
         <p class="footer__muted">Педагогический отряд ENERGY — школа вожатых и старших вожатых.</p>
+        {% set socials_dark = true %}{% include "_socials.html" %}
       </div>
       <div class="footer__links">
         <a href="/igroteka">Открытая игротека</a>
         <a href="/baza">База знаний</a>
-        <a href="{{ config.VK_URL }}" target="_blank" rel="noopener">Группа ВКонтакте</a>
-        {% if config.TG_CHANNEL_URL %}<a href="{{ config.TG_CHANNEL_URL }}" target="_blank" rel="noopener">Телеграм-канал</a>{% endif %}
         <a href="/privacy">Политика конфиденциальности</a>
       </div>
       <div class="footer__muted footer__copy">© {{ year() }} ENERGY</div>

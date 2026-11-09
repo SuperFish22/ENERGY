@@ -16,7 +16,7 @@
       "logo": "{{ config.SITE_URL }}/static/img/logo.jpg",
       "email": "{{ config.CONTACT_EMAIL }}",
       "slogan": "ENERGY. Дерзай!",
-      "sameAs": ["{{ config.VK_URL }}"{% if config.TG_CHANNEL_URL %}, "{{ config.TG_CHANNEL_URL }}"{% endif %}]
+      "sameAs": ["{{ config.VK_URL }}"{% if config.TG_CHANNEL_URL %}, "{{ config.TG_CHANNEL_URL }}"{% endif %}{% if config.INSTAGRAM_URL %}, "{{ config.INSTAGRAM_URL }}"{% endif %}]
     },
     {
       "@type": "Course",
@@ -29,7 +29,7 @@
     {
       "@type": "FAQPage",
       "mainEntity": [
-        {"@type": "Question", "name": "Сколько длится обучение?", "acceptedAnswer": {"@type": "Answer", "text": "Поток идёт 2 месяца: 8 занятий по субботам, последнее — аттестация. После потока — вожатский выезд. Стоимость 3000 рублей."}},
+        {"@type": "Question", "name": "Сколько длится обучение?", "acceptedAnswer": {"@type": "Answer", "text": "Поток идёт 2 месяца: 8 занятий по субботам, последнее — аттестация. После потока — обязательный вожатский выезд."}},
         {"@type": "Question", "name": "Нужен ли опыт?", "acceptedAnswer": {"@type": "Answer", "text": "Нет. Курс рассчитан на тех, кто только хочет стать вожатым."}},
         {"@type": "Question", "name": "Что будет после обучения?", "acceptedAnswer": {"@type": "Answer", "text": "Сертификат ENERGY и помощь с трудоустройством минимум на одну смену в лагерь."}}
       ]
@@ -59,6 +59,7 @@
         <a href="#zayavka" class="btn btn--lg">Записаться на поток</a>
         <a href="#potok" class="btn btn--ghost btn--lg">Как проходит обучение</a>
       </div>
+      {% include "_socials.html" %}
     </div>
     <div class="hero__art">
       <div class="orbit" aria-hidden="true"><span class="orbit__spark"></span></div>
@@ -123,7 +124,7 @@
       <div class="team-card"><b>Мастера</b><span>опытные наставники — «старшие вожатые» команд</span></div>
       <div class="team-card"><b>Кураторы</b><span>«вожатые» команды, на связи 24/7</span></div>
       <div class="team-card"><b>Методисты</b><span>наполняют занятия идеями и знаниями</span></div>
-      <div class="team-card"><b>Орг-группа</b><span>готовит легенду потока, вечерки</span></div>
+      <div class="team-card"><b>Орг-группа</b><span>готовит легенду потока, вечерки и выезд</span></div>
       <div class="team-card"><b>СМИ</b><span>ведут соцсети, фото и видео</span></div>
     </div>
 
@@ -138,7 +139,7 @@
       <div>
         <h3>И организации</h3>
         <ul class="chips chips--alt">
-          <li>Московский педагогический колледж</li><li>КЦ «ЗИЛ»</li><li>Российская государственная библиотека для молодёжи</li>
+          <li>Мосгортур</li><li>Московский педагогический колледж</li><li>КЦ «ЗИЛ»</li><li>Российская государственная библиотека для молодёжи</li>
           <li>Музейно-парковый комплекс «Северное Тушино»</li><li>Сеть квестов «Клаустрофобия»</li><li>Детский центр «Водолей»</li>
         </ul>
       </div>
@@ -159,7 +160,7 @@
         <li><b>Тест после каждого занятия</b><span>формат зачёт / незачёт, ссылка приходит в субботу вечером</span></li>
         <li><b>Своя тетрадь игротеки</b><span>переписываешь игры от руки — это допуск к экзамену</span></li>
         <li><b>Аттестация и сертификат</b><span>зачёт по играм и устный блок по теории</span></li>
-        <li><b>Вожатский выезд</b><span>после потока едем на 3 дня в лагерь — учимся и отрабатываем навыки</span></li>
+        <li><b>Обязательный вожатский выезд</b><span>после потока едем на 3 дня в лагерь — учимся и отрабатываем навыки</span></li>
         <li><b>Работа в лагере</b><span>помогаем трудоустроиться минимум на одну смену</span></li>
       </ul>
       <div class="day">
@@ -204,13 +205,13 @@
       <li class="step"><span class="step__n">1</span><h3>Заявка</h3><p>Заполни форму — напишем и расскажем про ближайший поток.</p></li>
       <li class="step"><span class="step__n">2</span><h3>Поток</h3><p>2 месяца занятий по субботам вместе с мастерами и кураторами.</p></li>
       <li class="step"><span class="step__n">3</span><h3>Аттестация</h3><p>Зачёт по играм, теория и сертификат ENERGY.</p></li>
-      <li class="step"><span class="step__n">4</span><h3>Выезд</h3><p>Вожатский выезд: 3 дня в лагере.</p></li>
+      <li class="step"><span class="step__n">4</span><h3>Выезд</h3><p>Обязательный вожатский выезд: 3 дня в лагере.</p></li>
       <li class="step"><span class="step__n">5</span><h3>Смена</h3><p>Работа в лагере — поможем трудоустроиться.</p></li>
     </ol>
     <div class="progress-teaser">
       <div class="progress-teaser__head"><b>Шкала развития в личном кабинете</b><span>Вход через Telegram</span></div>
       <div class="bar"><span style="width:68%"></span></div>
-      <div class="progress-teaser__legend"><span>Теория</span><span>Игротека</span><span>Посещаемость</span><span>Активность</span><span>Аттестация</span><span>Выезд</span></div>
+      <div class="progress-teaser__legend"><span>Теория</span><span>Игротека</span><span>Посещаемость</span><span>Активность</span><span>Выезд</span><span>Аттестация</span></div>
     </div>
   </div>
 </section>
@@ -265,7 +266,8 @@
       <p class="kicker">Запись на поток</p>
       <h2>Стань частью ENERGY</h2>
       <p>Оставь заявку на курс вожатых — мы свяжемся с тобой, расскажем про ближайший поток и ответим на все вопросы.</p>
-      <p class="form-side__alt">Удобнее в соцсетях? Пиши в <a href="{{ config.VK_URL }}" target="_blank" rel="noopener">сообщения группы ВКонтакте</a>{% if config.TG_CHANNEL_URL %} или читай наш <a href="{{ config.TG_CHANNEL_URL }}" target="_blank" rel="noopener">телеграм-канал</a>{% endif %}.</p>
+      <p class="form-side__alt">Удобнее в соцсетях? Пиши нам или подписывайся:</p>
+      {% include "_socials.html" %}
     </div>
 
     <form class="lead-form" method="post" action="/api/lead" id="lead-form" novalidate>

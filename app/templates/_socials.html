@@ -1,0 +1,6 @@
+{# Ссылки на соцсети. variant: '' (светлый фон) или 'dark' (тёмный фон) #}
+<div class="socials {{ 'socials--dark' if socials_dark is defined and socials_dark }}">
+  <a class="soc soc--vk" href="{{ config.VK_URL }}" target="_blank" rel="noopener"><i aria-hidden="true">VK</i><span>ВКонтакте</span></a>
+  {% if config.TG_CHANNEL_URL %}<a class="soc soc--tg" href="{{ config.TG_CHANNEL_URL }}" target="_blank" rel="noopener"><i aria-hidden="true">TG</i><span>Telegram</span></a>{% endif %}
+  {% if config.INSTAGRAM_URL %}<a class="soc soc--ig" href="{{ config.INSTAGRAM_URL }}" target="_blank" rel="noopener"><i aria-hidden="true">IG</i><span>Instagram</span></a>{% endif %}
+</div>

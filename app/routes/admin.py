@@ -77,7 +77,7 @@ async def lead_update(lead_id: int, request: Request,
 # ---------- Люди ----------
 
 @router.get("/users")
-def users(request: Request, q: str = "", role: str = "",
+def users(request: Request, q: str = "", role: str = "", test: int = 0,
           user: User = Depends(require("users.manage")), db: Session = Depends(get_db)):
     query = db.query(User)
     if role in ROLES:
@@ -85,8 +85,12 @@ def users(request: Request, q: str = "", role: str = "",
     if q:
         like = f"%{q.strip().lstrip('@')}%"
         query = query.filter(or_(User.first_name.ilike(like), User.last_name.ilike(like), User.username.ilike(like)))
+    if test:
+        query = query.filter(User.tg_id < 0)  # тестовые пользователи
+    from .testing import DEFAULT_COUNTS
     return render(request, "admin/users.html", user, people=query.order_by(User.id.desc()).limit(500).all(),
-                  q=q, role=role)
+                  q=q, role=role, test=test, default_counts=DEFAULT_COUNTS,
+                  test_total=db.query(User).filter(User.tg_id < 0).count())
 
 
 @router.post("/users/{uid}")

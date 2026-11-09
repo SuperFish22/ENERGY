@@ -9,7 +9,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from . import config
 from .db import SessionLocal, init_db
-from .routes import admin, admin_content, admin_school, auth, bot_api, cabinet, constructors, public, tests
+from .routes import admin, admin_content, admin_school, auth, bot_api, cabinet, constructors, public, testing, tests
 from .web import current_user, render
 
 @asynccontextmanager
@@ -26,13 +26,15 @@ app.add_middleware(
     secret_key=config.SECRET_KEY,
     session_cookie="energy_session",
     max_age=60 * 60 * 24 * 30,
-    same_site="lax",
+    # На https — SameSite=None: иначе внутри Telegram (Mini App открывается во встроенном окне)
+    # браузер не отдаёт cookie входа. От подделки запросов защищают CSRF-токены в формах.
+    same_site="none" if config.HTTPS_ONLY else "lax",
     https_only=config.HTTPS_ONLY,
 )
 app.mount("/static", StaticFiles(directory=str(config.BASE_DIR / "static")), name="static")
 
 for r in (public.router, auth.router, cabinet.router, tests.router, constructors.router,
-          admin.router, admin_content.router, admin_school.router, bot_api.router):
+          admin.router, admin_content.router, admin_school.router, bot_api.router, testing.router):
     app.include_router(r)
 
 

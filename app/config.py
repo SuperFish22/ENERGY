@@ -37,6 +37,7 @@ BOT_API_TOKEN = os.getenv("BOT_API_TOKEN", "")  # tg id людей, которы
 # Ссылки
 VK_URL = os.getenv("VK_URL", "https://vk.com/planeta.energy")
 TG_CHANNEL_URL = os.getenv("TG_CHANNEL_URL", "https://t.me/energy_getdrive")
+INSTAGRAM_URL = os.getenv("INSTAGRAM_URL", "")  # пусто — кнопка Instagram не показывается
 CONTACT_EMAIL = os.getenv("CONTACT_EMAIL", "brio.laboratory@gmail.com")
 
 # Вход без Телеграма — ТОЛЬКО для локальной разработки

@@ -3,10 +3,28 @@
 {% block admin %}
 <h1>Люди и роли</h1>
 <p class="muted small">Человек появляется здесь после первого входа на сайт через Telegram. Роль даёт постоянные права, группы — временные.</p>
+{% if (request.session.get('super') or user.tg_id in config.SUPERADMIN_IDS) and not request.session.get('real_uid') %}
+<details class="panel" style="margin-bottom:16px" {{ 'open' if test or not test_total }}>
+  <summary style="cursor:pointer;font-weight:800">Тестовые аккаунты{% if test_total %} · сейчас {{ test_total }}{% endif %}</summary>
+  <p class="small muted" style="margin:8px 0 12px">Укажите, сколько тестовых людей каждой роли создать. Энерты, мастера и кураторы попадут в группу «Тестовый поток» — на ней удобно проверять журнал и шкалу. Повторное нажатие добавляет ещё. «Войти как» — посмотреть сайт глазами человека; сверху будет кнопка возврата.</p>
+  <form method="post" action="/admin/test-users">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <div class="perm-grid" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">
+      {% for key, r in ROLES.items() %}<label class="field" style="font-size:.85rem"><span>{{ r.title }}</span><input type="number" name="n_{{ key }}" min="0" max="50" value="{{ default_counts.get(key, 1) if not test_total else 0 }}" class="input" style="padding:8px 10px"></label>{% endfor %}
+    </div>
+    <div class="inline-form" style="margin-top:12px">
+      <button class="btn btn--sm">Создать</button>
+      {% if test_total %}<a class="btn btn--sm btn--ghost" href="/admin/users?test=1">Показать только тестовых</a>{% endif %}
+    </div>
+  </form>
+  {% if test_total %}<form method="post" action="/admin/test-users/delete" style="margin-top:10px"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn btn--sm btn--danger" onclick="return confirm('Удалить всех тестовых пользователей ({{ test_total }}) и их данные: отметки, тесты, разработки?')">Удалить всех тестовых</button></form>{% endif %}
+</details>
+{% endif %}
 <div class="toolbar">
   <form class="inline-form">
     <input name="q" value="{{ q }}" placeholder="Имя или @ник">
     <select name="role"><option value="">Все роли</option>{% for key, r in ROLES.items() %}<option value="{{ key }}" {{ 'selected' if role == key }}>{{ r.title }}</option>{% endfor %}</select>
+    <label class="check" style="font-size:.88rem"><input type="checkbox" name="test" value="1" {{ 'checked' if test }}> <span>только тестовые</span></label>
     <button class="btn btn--sm">Найти</button>
   </form>
 </div>
@@ -15,7 +33,8 @@
   <tr><th>Человек</th><th>Telegram</th><th>Группы</th><th>Роль</th><th>Доступ</th></tr>
   {% for u in people %}
   <tr>
-    <td><a href="/admin/people/{{ u.id }}"><b>{{ u.display_name }}</b></a><div class="small muted">с {{ u.created_at|dt(False) }}</div></td>
+    <td><a href="/admin/people/{{ u.id }}"><b>{{ u.display_name }}</b></a><div class="small muted">с {{ u.created_at|dt(False) }}{% if u.tg_id < 0 %} · <span class="chip chip--orange">тест</span>{% endif %}</div>
+      {% if (request.session.get('super') or user.tg_id in config.SUPERADMIN_IDS) and not request.session.get('real_uid') and u.id != user.id %}<form method="post" action="/admin/impersonate/{{ u.id }}" style="margin-top:6px"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn btn--sm btn--ghost">Войти как</button></form>{% endif %}</td>
     <td class="small">{% if u.username %}@{{ u.username }}<br>{% endif %}<span class="muted">id {{ u.tg_id }}</span></td>
     <td>{% for g in u.groups if g.is_active %}<span class="chip chip--blue">{{ g.name }}</span>{% else %}<span class="muted small">—</span>{% endfor %}</td>
     <td>

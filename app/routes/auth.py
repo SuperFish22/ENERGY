@@ -27,6 +27,7 @@ def _login(request: Request, db: Session, tg_id: int, **fields) -> User:
     db.commit()
     request.session.clear()
     request.session["uid"] = user.id
+    request.session["super"] = tg_id in config.SUPERADMIN_IDS
     return user
 
 
